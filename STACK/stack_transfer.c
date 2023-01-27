@@ -18,6 +18,9 @@ extern uint32_t waittime; //waittime==1,延时10ms
 extern uint8_t putBallOrder[9];
 
 int cnt = 0;
+int error_red_1 = 0;
+int error_red_2 = 0;
+int error_red_3 = 0;
 
 /*定义仓库中随机工件的状态*/
 int storage_state[4][5] = {no};    //未实现的想法1
@@ -44,9 +47,6 @@ void scan_ball()
     }
 }
 
-int error_red_1 = 0;
-int error_red_2 = 0;
-int error_red_3 = 0;
 
 /**********************************************************************
  * @Name    stack_transfer_red
