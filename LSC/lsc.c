@@ -1,10 +1,10 @@
 #include "lsc.h"
 
 /**********************************************************************
-  * º¯ÊıÃû£ºcmd_action_group_run
-  * ÃèÊö: ·¢ËÍ¶¯×÷×éÃüÁî
-  * ²ÎÊı£º¶¯×÷×é±àºÅ   Ö´ĞĞ´ÎÊı
-  * ·µ»ØÖµ:ÎŞ
+  * å‡½æ•°åï¼šcmd_action_group_run
+  * æè¿°: å‘é€åŠ¨ä½œç»„å‘½ä»¤
+  * å‚æ•°ï¼šåŠ¨ä½œç»„ç¼–å·   æ‰§è¡Œæ¬¡æ•°
+  * è¿”å›å€¼:æ— 
 ***********************************************************************/
 void cmd_action_group_run(uint8_t action_group,uint16_t number)
 {
@@ -20,10 +20,10 @@ void cmd_action_group_run(uint8_t action_group,uint16_t number)
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºcmd_action_group_speed
-  * ÃèÊö: µ÷½Ú¶¯×÷×éÖ´ĞĞËÙ¶È
-  * ²ÎÊı£º¶¯×÷×é±àºÅ   Ö´ĞĞËÙ¶È
-  * ·µ»ØÖµ:ÎŞ
+  * å‡½æ•°åï¼šcmd_action_group_speed
+  * æè¿°: è°ƒèŠ‚åŠ¨ä½œç»„æ‰§è¡Œé€Ÿåº¦
+  * å‚æ•°ï¼šåŠ¨ä½œç»„ç¼–å·   æ‰§è¡Œé€Ÿåº¦
+  * è¿”å›å€¼:æ— 
 ***********************************************************************/
 void cmd_action_group_speed(uint8_t action_group,uint16_t speed)
 {
@@ -35,14 +35,14 @@ void cmd_action_group_speed(uint8_t action_group,uint16_t speed)
     command[4] = action_group;
     command[5] = speed&0XFF;
     command[6] = (speed>>8)&0XFF;
-    HAL_UART_Transmit(&huart8,command,7,1000);  //·¢ËÍ¶¯×÷×é±àºÅºÍÖ´ĞĞËÙ¶È
+    HAL_UART_Transmit(&huart8,command,7,1000);  //å‘é€åŠ¨ä½œç»„ç¼–å·å’Œæ‰§è¡Œé€Ÿåº¦
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºcmd_action_group_stop
-  * ÃèÊö: ·¢ËÍÍ£Ö¹ÃüÁî
-  * ²ÎÊı£ºÎŞ   
-  * ·µ»ØÖµ:ÎŞ
+  * å‡½æ•°åï¼šcmd_action_group_stop
+  * æè¿°: å‘é€åœæ­¢å‘½ä»¤
+  * å‚æ•°ï¼šæ—    
+  * è¿”å›å€¼:æ— 
 ***********************************************************************/
 void cmd_action_group_stop()
 {
@@ -55,24 +55,24 @@ void cmd_action_group_stop()
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºservogroup_Init
-  * ÃèÊö: ¶¯×÷×é³õÊ¼»¯
-  * ²ÎÊı£ºÎŞ   
-  * ·µ»ØÖµ:ÎŞ
+  * å‡½æ•°åï¼šservogroup_Init
+  * æè¿°: åŠ¨ä½œç»„åˆå§‹åŒ–
+  * å‚æ•°ï¼šæ—    
+  * è¿”å›å€¼:æ— 
 ***********************************************************************/
 void servogroup_Init()
 {
-    cmd_action_group_run(0x00,1);   //·¢ËÍ¶¯×÷×éÖ¸Áî0x00 Ö´ĞĞÒ»´Î
+    cmd_action_group_run(0x00,1);   //å‘é€åŠ¨ä½œç»„æŒ‡ä»¤0x00 æ‰§è¡Œä¸€æ¬¡
 }
 
-//½×ÌİÆ½Ì¨¼ì²â
+//é˜¶æ¢¯å¹³å°æ£€æµ‹
 void servogroup_Stepped_distinguish()
 {
-    cmd_action_group_speed(0x01,275);     //Éè¶¨¶¯×÷×é0x01µÄÖ´ĞĞËÙ¶ÈÊÇ175
-    cmd_action_group_run(0x01,1);        //Ö´ĞĞÒ»´Î¶¯×÷×é0x01
+    cmd_action_group_speed(0x01,275);     //è®¾å®šåŠ¨ä½œç»„0x01çš„æ‰§è¡Œé€Ÿåº¦æ˜¯175
+    cmd_action_group_run(0x01,1);        //æ‰§è¡Œä¸€æ¬¡åŠ¨ä½œç»„0x01
 }
 
-//´ÓµÚ¶şÆ½Ì¨ÄÃÇò
+//ä»ç¬¬äºŒå¹³å°æ‹¿çƒ
 void servogroup_catch_Steppedplatform_2()
 {
     cmd_action_group_speed(0x02,150);
@@ -109,14 +109,14 @@ void servogroup_catch_Steppedplatform_6()
     cmd_action_group_run(0x36,1);
 }
 
-//¶¯×÷×é¼ì²âÔ²ÅÌ»ú
+//åŠ¨ä½œç»„æ£€æµ‹åœ†ç›˜æœº
 void servogroup_catch_Stripplatform()
 {
     cmd_action_group_speed(0x15,350);       
     cmd_action_group_run(0x15,1);         
 }
 
-//¶¯×÷×éÔ²ÅÌ»úµ½»ñÈ¡id
+//åŠ¨ä½œç»„åœ†ç›˜æœºåˆ°è·å–id
 void servogroup_ic_Stripplatform()
 {
     cmd_action_group_speed(0x17,200);       
