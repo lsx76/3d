@@ -49,7 +49,7 @@
 /* USER CODE BEGIN PTD */
 
 
- /* ³õÊ¼»¯ËÄ¸öµç»ú²¢Ê¹ÄÜ*/
+ /* åˆå§‹åŒ–å››ä¸ªç”µæœºå¹¶ä½¿èƒ½*/
   extern motor_t motor1;
   extern motor_t motor2;
   extern motor_t motor3;
@@ -150,14 +150,15 @@ int main(void)
   MX_UART8_Init();
   MX_UART7_Init();
   MX_USART3_UART_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 	HAL_UART_Receive_IT(&huart1,&Buffer,1);
-	usmart_dev.init(108); 		    //³õÊ¼»¯USMART
+	usmart_dev.init(108); 		    //åˆå§‹åŒ–USMART testtest
 	
 	HAL_UART_Receive_IT(&huart6,&M294_Rx_buffer, 1);
 	HAL_UART_Receive_IT(&huart7,&qrcode_Rx_buffer, 1);
 
-	HAL_UART_Receive_IT(&huart3,OPENMV_Rx_BUF,5);   //´®¿Ú²âÊÔ
+	HAL_UART_Receive_IT(&huart3,OPENMV_Rx_BUF,5);   //ä¸²å£æµ‹è¯•
 	
 	motor1_Enable(&motor1);
   motor2_Enable(&motor2);
@@ -169,7 +170,7 @@ int main(void)
   motor_pid_data_init(&motor3_pid_data);
   motor_pid_data_init(&motor4_pid_data);
 	track_pid_data_init(&track_pid_data);
-	receive_imu901_Init(&attitude);//ÕâÀïÊ¹ÄÜÁË´®¿Ú5ÖĞ¶Ï	`
+	receive_imu901_Init(&attitude);//è¿™é‡Œä½¿èƒ½äº†ä¸²å£5ä¸­æ–­	`
 	Steering_Init(&turnover_steering);
 	delay_init();
  
@@ -177,7 +178,7 @@ int main(void)
 //	set_track_status(&vertical_bar,true);
 	
 	
-	HAL_TIM_Base_Start_IT(&htim6);//µ÷ÂÖ×ÓpidÊ±×¢ÊÍµô
+	HAL_TIM_Base_Start_IT(&htim6);//è°ƒè½®å­pidæ—¶æ³¨é‡Šæ‰
 //	
 	imu_calibration();
 	delay_ms(1000);
@@ -313,8 +314,8 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 //			set_motor_speed(1,0);
-//		printf("%f , %f \n",motor1_pid_data.feedback,motor1_pid_data.expect);//µ÷ÂÖ×Ópid
-//		motor_pid();//µ÷ÂÖ×Ópid
+//		printf("%f , %f \n",motor1_pid_data.feedback,motor1_pid_data.expect);//è°ƒè½®å­pid
+//		motor_pid();//è°ƒè½®å­pid
 		
   }
   /* USER CODE END 3 */
