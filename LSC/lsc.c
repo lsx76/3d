@@ -3,7 +3,7 @@
 /**********************************************************************
  * @Name    cmd_action_group_run
  * @declaration : 发送动作组指令
- * @param   action_group 动作组编号      number  执行次数
+ * @param   action_group  动作组序号    number  执行次数
  * @retval   : 无
  * @author  hoson_stars
  ***********************************************************************/
@@ -22,8 +22,8 @@ void cmd_action_group_run(uint8_t action_group,uint16_t number)
 
 /**********************************************************************
  * @Name    cmd_action_group_speed
- * @declaration : 调节动作组执行速度
- * @param   action_group 动作组编号      speed  执行速度
+ * @declaration : 调整动作组执行速度
+ * @param   action_group  动作组序号    speed  执行速度
  * @retval   : 无
  * @author  hoson_stars
  ***********************************************************************/
@@ -41,11 +41,12 @@ void cmd_action_group_speed(uint8_t action_group,uint16_t speed)
 }
 
 /**********************************************************************
-  * 函数名：cmd_action_group_stop
-  * 描述: 发送停止命令
-  * 参数：无   
-  * 返回值:无
-***********************************************************************/
+ * @Name    cmd_action_group_stop
+ * @declaration : 发送停止命令
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void cmd_action_group_stop()
 {
     uint8_t command[4];
@@ -57,17 +58,24 @@ void cmd_action_group_stop()
 }
 
 /**********************************************************************
-  * 函数名：servogroup_Init
-  * 描述: 动作组初始化
-  * 参数：无   
-  * 返回值:无
-***********************************************************************/
+ * @Name    servogroup_Init
+ * @declaration : 动作组初始化
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void servogroup_Init()
 {
     cmd_action_group_run(0x00,1);   //发送动作组指令0x00 执行一次
 }
 
-//阶梯平台检测
+/**********************************************************************
+ * @Name    servogroup_Stepped_distinguish
+ * @declaration : 执行阶梯平台检测动作组
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void servogroup_Stepped_distinguish()
 {
     cmd_action_group_speed(0x01,275);     //设定动作组0x01的执行速度是175
@@ -75,50 +83,104 @@ void servogroup_Stepped_distinguish()
 }
 
 //从第二平台拿球
+/**********************************************************************
+ * @Name    servogroup_catch_Steppedplatform_2
+ * @declaration : 执行第二阶梯平台取球动作组
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void servogroup_catch_Steppedplatform_2()
 {
     cmd_action_group_speed(0x02,150);
     cmd_action_group_run(0x02,1);
 }
 
+/**********************************************************************
+ * @Name    servogroup_catch_Steppedplatform_1
+ * @declaration : 执行第一阶梯平台取球动作组
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void servogroup_catch_Steppedplatform_1()
 {
     cmd_action_group_speed(0x03,150);
     cmd_action_group_run(0x03,1);
 }
 
+/**********************************************************************
+ * @Name    servogroup_catch_Steppedplatform_3
+ * @declaration : 执行第三阶梯平台取球动作组
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void servogroup_catch_Steppedplatform_3()
 {
     cmd_action_group_speed(0x04,150);
     cmd_action_group_run(0x04,1);
 }
 
+/**********************************************************************
+ * @Name    servogroup_catch_Steppedplatform_4
+ * @declaration : 执行第二阶梯平台取球动作组（蓝半场）
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void servogroup_catch_Steppedplatform_4()
 {
     cmd_action_group_speed(0x33,150);
     cmd_action_group_run(0x33,1);
 }
 
+/**********************************************************************
+ * @Name    servogroup_catch_Steppedplatform_5
+ * @declaration : 执行第一阶梯平台取球动作组（蓝半场）
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void servogroup_catch_Steppedplatform_5()
 {
     cmd_action_group_speed(0x35,150);
     cmd_action_group_run(0x35,1);
 }
 
+/**********************************************************************
+ * @Name    servogroup_catch_Steppedplatform_6
+ * @declaration : 执行第三阶梯平台取球动作组（蓝半场）
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void servogroup_catch_Steppedplatform_6()
 {
     cmd_action_group_speed(0x36,150);
     cmd_action_group_run(0x36,1);
 }
 
-//动作组检测圆盘机
+/**********************************************************************
+ * @Name    servogroup_catch_Stripplatform
+ * @declaration : 执行圆盘机检测动作组
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void servogroup_catch_Stripplatform()
 {
     cmd_action_group_speed(0x15,350);       
     cmd_action_group_run(0x15,1);         
 }
 
-//动作组圆盘机到获取id
+/**********************************************************************
+ * @Name    servogroup_ic_Stripplatform
+ * @declaration : 执行圆盘机获取id动作组
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void servogroup_ic_Stripplatform()
 {
     cmd_action_group_speed(0x17,200);       
