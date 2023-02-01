@@ -1,11 +1,12 @@
 #include "lsc.h"
 
 /**********************************************************************
-  * 函数名：cmd_action_group_run
-  * 描述: 发送动作组命令
-  * 参数：动作组编号   执行次数
-  * 返回值:无
-***********************************************************************/
+ * @Name    cmd_action_group_run
+ * @declaration : 发送动作组指令
+ * @param   action_group 动作组编号      number  执行次数
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void cmd_action_group_run(uint8_t action_group,uint16_t number)
 {
     uint8_t command[7];
@@ -20,11 +21,12 @@ void cmd_action_group_run(uint8_t action_group,uint16_t number)
 }
 
 /**********************************************************************
-  * 函数名：cmd_action_group_speed
-  * 描述: 调节动作组执行速度
-  * 参数：动作组编号   执行速度
-  * 返回值:无
-***********************************************************************/
+ * @Name    cmd_action_group_speed
+ * @declaration : 调节动作组执行速度
+ * @param   action_group 动作组编号      speed  执行速度
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void cmd_action_group_speed(uint8_t action_group,uint16_t speed)
 {
     uint8_t command[7];

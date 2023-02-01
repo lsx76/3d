@@ -33,7 +33,7 @@ int need_to_transfer[4]={0};      //未实现想法2
  * @declaration : 获取小球id
  * @param   None
  * @retval   : 无
- * @author  hoson_star
+ * @author  hoson_stars
  ***********************************************************************/
 void scan_ball()
 {
