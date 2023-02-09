@@ -5,13 +5,13 @@ extern double motor_target[5];
 //extern int val_track_front;
 //extern int val_track_back;
 
-/* ¶¨ÒåËÄ¸öµç»ú½øĞĞpid²Ù×÷µÄÊı¾İ */
+/* å®šä¹‰å››ä¸ªç”µæœºè¿›è¡Œpidæ“ä½œçš„æ•°æ® */
 pid_data_t motor1_pid_data;
 pid_data_t motor2_pid_data;
 pid_data_t motor3_pid_data;
 pid_data_t motor4_pid_data;
 
-/* µç»ú1×îÍâ²ãpid¿ØÖÆ²ÎÊı */
+/* ç”µæœº1æœ€å¤–å±‚pidæ§åˆ¶å‚æ•° */
 pid_paramer_t motor1_pid_paramer = {
     .integrate_max = 7000,
     .kp = 78,
@@ -20,7 +20,7 @@ pid_paramer_t motor1_pid_paramer = {
     .control_output_limit = 9000
 };
 
-/* µç»ú2×îÍâ²ãpid¿ØÖÆ²ÎÊı */
+/* ç”µæœº2æœ€å¤–å±‚pidæ§åˆ¶å‚æ•° */
 pid_paramer_t motor2_pid_paramer = {
     .integrate_max = 7000,
     .kp = 78,
@@ -29,7 +29,7 @@ pid_paramer_t motor2_pid_paramer = {
     .control_output_limit = 9000
 };
 
-/* µç»ú3×îÍâ²ãpid¿ØÖÆ²ÎÊı */
+/* ç”µæœº3æœ€å¤–å±‚pidæ§åˆ¶å‚æ•° */
 pid_paramer_t motor3_pid_paramer = {
     .integrate_max = 7000,
     .kp = 78,
@@ -38,7 +38,7 @@ pid_paramer_t motor3_pid_paramer = {
     .control_output_limit = 9000
 };
 
-/* µç»ú4×îÍâ²ãpid¿ØÖÆ²ÎÊı */
+/* ç”µæœº4æœ€å¤–å±‚pidæ§åˆ¶å‚æ•° */
 pid_paramer_t motor4_pid_paramer = {
     .integrate_max = 7000,
     .kp = 78,
@@ -49,11 +49,11 @@ pid_paramer_t motor4_pid_paramer = {
 
 
 /**********************************************************************************************************
-*º¯ Êı Ãû: set_motor1_pid
-*¹¦ÄÜËµÃ÷: ÓÃÀ´ÔÚusmartÉÏµ÷Õûpid²ÎÊı
-*ĞÎ    ²Î: µç»ú±àºÅ p i d
-*·µ »Ø Öµ: ÎŞ
-*±¸    ×¢: ×îÖÕµ÷ÊÔÊ±¾õµÃÕâÑùpid²ÎÊı²»ÄÜÖ±¹ÛµÄ±íÏÖ³öÀ´ËùÒÔÆúÓÃ
+*å‡½ æ•° å: set_motor1_pid
+*åŠŸèƒ½è¯´æ˜: ç”¨æ¥åœ¨usmartä¸Šè°ƒæ•´pidå‚æ•°
+*å½¢    å‚: ç”µæœºç¼–å· p i d
+*è¿” å› å€¼: æ— 
+*å¤‡    æ³¨: æœ€ç»ˆè°ƒè¯•æ—¶è§‰å¾—è¿™æ ·pidå‚æ•°ä¸èƒ½ç›´è§‚çš„è¡¨ç°å‡ºæ¥æ‰€ä»¥å¼ƒç”¨
 **********************************************************************************************************/
 
 //void set_motor1_pid(uint16_t num,float p,float i,float d)
@@ -76,11 +76,12 @@ pid_paramer_t motor4_pid_paramer = {
 //}
 
 /**********************************************************************
-  * º¯ÊıÃû£ºmotor_pid_data_init
-  * ÃèÊö: ³õÊ¼»¯µç»úpidÊı¾İ
-  * ²ÎÊı£ºmotor_pid_data½á¹¹Ìå
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    motor_pid_data_init
+ * @declaration : ç”µæœºpidåˆå§‹åŒ–
+ * @param   motor_pid_data ç”µæœºpidç»“æ„ä½“
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void motor_pid_data_init(pid_data_t *motor_pid_data)
 {
     motor_pid_data->expect = 0;
@@ -101,11 +102,19 @@ void motor_pid_data_init(pid_data_t *motor_pid_data)
 }
 
 /**********************************************************************************************************
-*º¯ Êı Ãû: read_freq
-*¹¦ÄÜËµÃ÷: ¶ÁÈ¡motor½á¹¹ÌåÖĞµÄfreq²¢·µ»Ø
-*ĞÎ    ²Î: motor½á¹¹ÌåµÄµØÖ· 
-*·µ »Ø Öµ: µç»ú×ª¶¯ÆµÂÊ£¨·´Ó¦ËÙ¶È£©
+*å‡½ æ•° å: read_freq
+*åŠŸèƒ½è¯´æ˜: è¯»å–motorç»“æ„ä½“ä¸­çš„freqå¹¶è¿”å›
+*å½¢    å‚: motorç»“æ„ä½“çš„åœ°å€ 
+*è¿” å› å€¼: ç”µæœºè½¬åŠ¨é¢‘ç‡ï¼ˆååº”é€Ÿåº¦ï¼‰
 **********************************************************************************************************/
+
+/**********************************************************************
+ * @Name    read_freq
+ * @declaration : è¯»å–motorç»“æ„ä½“ä¸­çš„freqå¹¶è¿”å› 
+ * @param   motor ç”µæœºç»“æ„ä½“
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 int32_t read_freq(motor_t *motor)
 {   double temp = motor->freq;
     motor->freq = 0;
@@ -113,35 +122,36 @@ int32_t read_freq(motor_t *motor)
 }
 
 
-/**********************************************************************************************************
-*º¯ Êı Ãû: motor_pid
-*¹¦ÄÜËµÃ÷: µç»úpid
-*ĞÎ    ²Î: ÎŞ 
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    motor_pid
+ * @declaration : ç”µæœºpid 
+ * @param   None 
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void motor_pid()
 {
-   /*¼ÆËãµç»ú×îÖÕÄ¿±êÖµ*/
+   /*è®¡ç®—ç”µæœºæœ€ç»ˆç›®æ ‡å€¼*/
    motor1_pid_data.expect = motor_target[1] ;//+ val_track_front + val_track_back;
    motor2_pid_data.expect = motor_target[2] ;//+ val_track_front + val_track_back;
    motor3_pid_data.expect = motor_target[3] ;//+ val_track_front + val_track_back;
    motor4_pid_data.expect = motor_target[4] ;//+ val_track_front + val_track_back;
   
-   /*¶ÁÈ¡µ±Ç°µç»ú×ªËÙ*/
+   /*è¯»å–å½“å‰ç”µæœºè½¬é€Ÿ*/
    motor1_pid_data.feedback = read_freq(&motor1);
    motor2_pid_data.feedback = read_freq(&motor2);
    motor3_pid_data.feedback = read_freq(&motor3);
    motor4_pid_data.feedback = read_freq(&motor4);
   
-	/*½øĞĞpidÔËËã ²¢½«Êä³öÖµ×¢Èëµç»úÍ¨µÀ*/
+	/*è¿›è¡Œpidè¿ç®— å¹¶å°†è¾“å‡ºå€¼æ³¨å…¥ç”µæœºé€šé“*/
 //   set_motor_speed(4, pid_incremental(&motor4_pid_data,&motor4_pid_paramer));
 //   set_motor_speed(1, pid_incremental(&motor1_pid_data,&motor1_pid_paramer));
 //   set_motor_speed(2, pid_incremental(&motor2_pid_data,&motor2_pid_paramer));
 //   set_motor_speed(3, pid_incremental(&motor3_pid_data,&motor3_pid_paramer));
-		set_motor_speed(&motor1, pid_incremental(&motor1_pid_data,&motor1_pid_paramer));
-   set_motor_speed(&motor2, pid_incremental(&motor2_pid_data,&motor2_pid_paramer));
-   set_motor_speed(&motor3, pid_incremental(&motor3_pid_data,&motor3_pid_paramer));
-   set_motor_speed(&motor4, pid_incremental(&motor4_pid_data,&motor4_pid_paramer));
+	set_motor_speed(&motor1, pid_incremental(&motor1_pid_data,&motor1_pid_paramer));
+    set_motor_speed(&motor2, pid_incremental(&motor2_pid_data,&motor2_pid_paramer));
+    set_motor_speed(&motor3, pid_incremental(&motor3_pid_data,&motor3_pid_paramer));
+    set_motor_speed(&motor4, pid_incremental(&motor4_pid_data,&motor4_pid_paramer));
    
    printf("%f , %f\n",motor2_pid_data.expect ,motor2_pid_data.feedback );
    // printf("%f,%f,%f,%f,%f,%f\n",motor1_pid_data.feedback,motor2_pid_data.feedback,motor3_pid_data.feedback,motor4_pid_data.feedback,motor1_pid_data.expect,motor3_pid_data.expect); 

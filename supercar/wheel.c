@@ -7,18 +7,18 @@
 #include "time_cnt.h"
 #include "stdio.h"
 
-#define CHASSIS_RADIUS 21.0         //³µÌåÖĞĞÄµ½ÂÖ×ÓÖáĞÄ¾àÀë
-#define WHEEL_ANGLE 45            //È«ÏòÂÖĞ¡ÂÖì±Óë³µÌå×ø±êÏµxÖá¼Ğ½Ç
-#define RADIAN 57.3                 //µ¥Î»»¡¶È¶ÔÓ¦µÄ½Ç¶È
-#define MAX_SPEED 250               //ÏŞÖÆµç»úÔË×ª×î´óËÙ¶È
-#define TIME_PARAM 2               //µÈ´ıÊ±¼ä
+#define CHASSIS_RADIUS 21.0         //è½¦ä½“ä¸­å¿ƒåˆ°è½®å­è½´å¿ƒè·ç¦»
+#define WHEEL_ANGLE 45            //å…¨å‘è½®å°è½®æ¯‚ä¸è½¦ä½“åæ ‡ç³»xè½´å¤¹è§’
+#define RADIAN 57.3                 //å•ä½å¼§åº¦å¯¹åº”çš„è§’åº¦
+#define MAX_SPEED 250               //é™åˆ¶ç”µæœºè¿è½¬æœ€å¤§é€Ÿåº¦
+#define TIME_PARAM 2               //ç­‰å¾…æ—¶é—´
 
-#define ENCODE_THRESHOLD 20         //±àÂëÆ÷¼ÆÊıÂ·¾¶ãĞÖµ
-#define ENCODER_FACTOR 4            //±àÂëÆ÷¼ÆÊıP»··Å´óÒò×Ó
+#define ENCODE_THRESHOLD 20         //ç¼–ç å™¨è®¡æ•°è·¯å¾„é˜ˆå€¼
+#define ENCODER_FACTOR 4            //ç¼–ç å™¨è®¡æ•°Pç¯æ”¾å¤§å› å­
 
-uint32_t time = 0;                  //»ñÈ¡µÄÏµÍ³ÔËĞĞÊ±¼ä
-unsigned short int  time_count=0;   //¼ÆÊı
-chassis_t chassis_param;            //¶¨Òåµ×ÅÌ²ÎÊı
+uint32_t time = 0;                  //è·å–çš„ç³»ç»Ÿè¿è¡Œæ—¶é—´
+unsigned short int  time_count=0;   //è®¡æ•°
+chassis_t chassis_param;            //å®šä¹‰åº•ç›˜å‚æ•°
 
 extern motor_t motor1;
 extern motor_t motor2;
@@ -26,20 +26,21 @@ extern motor_t motor3;
 extern motor_t motor4;
 extern ATTITUDE_t  attitude;
 
-double motor_target[5];              //´æ´¢ËÄ¸öµç»úËÙ¶ÈµÄÄ¿±êÖµ
-int val_track_row = 0;				//±£´æÑ­¼£pidµÄÊä³öÖµ
+double motor_target[5];              //å­˜å‚¨å››ä¸ªç”µæœºé€Ÿåº¦çš„ç›®æ ‡å€¼
+int val_track_row = 0;				//ä¿å­˜å¾ªè¿¹pidçš„è¾“å‡ºå€¼
 int val_track_vertical = 0; 
-int val_imu = 0;                //±£´æÍÓÂİÒÇpidµÄÊä³öÖµ
+int val_imu = 0;                //ä¿å­˜é™€èºä»ªpidçš„è¾“å‡ºå€¼
 
 //extern uint8_t red_mode;
 //extern uint8_t blue_mode;
 
-/************************************************************
-*º¯ Êı Ãû:set_chassis_speed
-*¹¦ÄÜËµÃ÷:Ö±½Ó¶ÔÄ¿±êËÙ¶ÈÖµ½øĞĞĞŞ¸Ä
-*ĞÎ    ²Î:Á½¸ö·½ÏòµÄËÙ¶È
-*·µ »Ø Öµ:ÎŞ
-**************************************************************/
+/**********************************************************************
+ * @Name    set_chassis_speed
+ * @declaration : ç›´æ¥å¯¹ç›®æ ‡é€Ÿåº¦å€¼è¿›è¡Œä¿®æ”¹
+ * @param   x y w å¯¹åº”æ–¹å‘çš„å€¼
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void set_chassis_speed (float x, float y, float w)
 {
     chassis_param.x_speed = x;
@@ -48,22 +49,23 @@ void set_chassis_speed (float x, float y, float w)
 }
 
 ///************************************************************
-//*º¯ Êı Ãû:change_chassis_status
-//*¹¦ÄÜËµÃ÷:µ×ÅÌÊ¹ÄÜ¿ª¹Ø
-//*ĞÎ    ²Î:×´Ì¬£¬boolÖµ
-//*·µ »Ø Öµ:ÎŞ
+//*å‡½ æ•° å:change_chassis_status
+//*åŠŸèƒ½è¯´æ˜:åº•ç›˜ä½¿èƒ½å¼€å…³
+//*å½¢    å‚:çŠ¶æ€ï¼Œboolå€¼
+//*è¿” å› å€¼:æ— 
 //**************************************************************/
 //void change_chassis_status(bool status)
 //{
 //    chassis_param.status = status;
 //}
 
-/************************************************************
-*º¯ Êı Ãû:chassis_synthetic_control
-*¹¦ÄÜËµÃ÷:µ×ÅÌµÄ×ÛºÏ¿ØÖÆº¯Êı£¬°üº¬¶àÖÖ¿ØÖÆ ÄÚ²ãÓëÍâ²ãPID
-*ĞÎ    ²Î:ÎŞ
-*·µ »Ø Öµ:ÎŞ
-**************************************************************/
+/**********************************************************************
+ * @Name    chassis_synthetic_control
+ * @declaration : åº•ç›˜çš„ç»¼åˆæ§åˆ¶å‡½æ•°ï¼ŒåŒ…å«å¤šç§æ§åˆ¶ å†…å±‚ä¸å¤–å±‚PID
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
  void chassis_synthetic_control(void)
 {
 		static long long int cnt=0;
@@ -71,10 +73,10 @@ void set_chassis_speed (float x, float y, float w)
 //    int i;
     double x, y, w; 
 //   double max_val, factor;
-//    if(chassis_param.status == false) return;//Èç¹ûµ×ÅÌ²»±»Ê¹ÄÜ£¬ÔòÃ»ÓĞºóĞø²Ù×÷
+//    if(chassis_param.status == false) return;//å¦‚æœåº•ç›˜ä¸è¢«ä½¿èƒ½ï¼Œåˆ™æ²¡æœ‰åç»­æ“ä½œ
 
-//    max_val = 0;        //¶Ô×î´óÖµÊı¾İ½øĞĞ³õÊ¼»¯
-//    factor = 1;         //±¶ÂÊÒò×Ó³õÊ¼»¯
+//    max_val = 0;        //å¯¹æœ€å¤§å€¼æ•°æ®è¿›è¡Œåˆå§‹åŒ–
+//    factor = 1;         //å€ç‡å› å­åˆå§‹åŒ–
 
     time_count++;
     if(time_count == TIME_PARAM) {
@@ -89,10 +91,10 @@ void set_chassis_speed (float x, float y, float w)
     w = chassis_param.w_speed + val_imu;
         
     /***************************************
-     * motor1  Ç°·½ÓÒ²à
-     * motor2  ºó·½ÓÒ²à
-     * motor3  Ç°·½×ó²à
-     * motor4  ºó·½×ó²à
+     * motor1  å‰æ–¹å³ä¾§
+     * motor2  åæ–¹å³ä¾§
+     * motor3  å‰æ–¹å·¦ä¾§
+     * motor4  åæ–¹å·¦ä¾§
     ****************************************/
 //    motor_target[1] = -cos(WHEEL_ANGLE/RADIAN) * x + sin(WHEEL_ANGLE/RADIAN) * y + CHASSIS_RADIUS * w;
 //    motor_target[2] = cos(WHEEL_ANGLE/RADIAN) * x + sin(WHEEL_ANGLE/RADIAN) * y + CHASSIS_RADIUS * w;
@@ -110,12 +112,12 @@ void set_chassis_speed (float x, float y, float w)
 //    
    
     
-//    /* ÔÙÀ´Ò»¸öÏŞ·ù²Ù×÷£¬±ÜÃâµ¥±ßËÙ¶È¹ı¸ßµ¼ÖÂ¿ØÖÆĞ§¹û²»ÀíÏë */
-//    for(i = 1; i <= 4; ++i) {                                       //ÕÒ³ö×î´óÖµ
+//    /* å†æ¥ä¸€ä¸ªé™å¹…æ“ä½œï¼Œé¿å…å•è¾¹é€Ÿåº¦è¿‡é«˜å¯¼è‡´æ§åˆ¶æ•ˆæœä¸ç†æƒ³ */
+//    for(i = 1; i <= 4; ++i) {                                       //æ‰¾å‡ºæœ€å¤§å€¼
 //        if(motor_target[i] > max_val) max_val = motor_target[i];
 //    }
 //    
-//    /*×î´óÖµÊÇ·ñ³¬ÏŞÖÆ£¬½øĞĞ²Ù×÷£¬È·±£×î´óÖµÈÔÔÚ·¶Î§ÄÚÇÒ×ªËÙ±ÈÀı²»±ä*/
+//    /*æœ€å¤§å€¼æ˜¯å¦è¶…é™åˆ¶ï¼Œè¿›è¡Œæ“ä½œï¼Œç¡®ä¿æœ€å¤§å€¼ä»åœ¨èŒƒå›´å†…ä¸”è½¬é€Ÿæ¯”ä¾‹ä¸å˜*/
 //    if(max_val > MAX_SPEED) {             
 //        factor = MAX_SPEED / max_val;
 //        for(i = 1; i < 4; ++ i) {
@@ -123,20 +125,20 @@ void set_chassis_speed (float x, float y, float w)
 //        }
 //    }
     
-   /*×îÍâ²ãµç»úpid²Ù×÷*/
-   /*¼ÆËãµç»ú×îÖÕÄ¿±êÖµ*/
+   /*æœ€å¤–å±‚ç”µæœºpidæ“ä½œ*/
+   /*è®¡ç®—ç”µæœºæœ€ç»ˆç›®æ ‡å€¼*/
    motor1_pid_data.expect = motor_target[1]; //+ val_track_row;// + val_track_back;
    motor2_pid_data.expect = motor_target[2]; //+ val_track_vertical;// + val_track_back;
    motor3_pid_data.expect = motor_target[3];// + val_track_row;// + val_track_back;
    motor4_pid_data.expect = motor_target[4];// + val_track_vertical;// + val_track_back;
   
-   /*¶ÁÈ¡µ±Ç°µç»ú×ªËÙ*/
+   /*è¯»å–å½“å‰ç”µæœºè½¬é€Ÿ*/
    motor1_pid_data.feedback = -read_freq(&motor1);
    motor2_pid_data.feedback = read_freq(&motor2);
    motor3_pid_data.feedback = -read_freq(&motor3);
    motor4_pid_data.feedback = read_freq(&motor4);
   
-   /*½øĞĞpidÔËËã ²¢½«Êä³öÖµ×¢Èëµç»úÍ¨µÀ*/
+   /*è¿›è¡Œpidè¿ç®— å¹¶å°†è¾“å‡ºå€¼æ³¨å…¥ç”µæœºé€šé“*/
    float why =0;
 	 set_motor_speed(&motor1, pid_incremental(&motor1_pid_data,&motor1_pid_paramer));
    set_motor_speed(&motor2, pid_incremental(&motor2_pid_data,&motor2_pid_paramer));
@@ -155,34 +157,35 @@ void set_chassis_speed (float x, float y, float w)
 }
 
 
-/************************************************************
-*º¯ Êı Ãû:move_by_encoder
-*¹¦ÄÜËµÃ÷:Í¨¹ı±àÂëÆ÷¹æ¶¨Â·³ÌĞĞ×ß
-*ĞÎ    ²Î:·½Ïò Â·³Ì
-*·µ »Ø Öµ:ÎŞ
-**************************************************************/
+/**********************************************************************
+ * @Name    move_by_encoder
+ * @declaration : é€šè¿‡ç¼–ç å™¨è§„å®šè·¯ç¨‹è¡Œèµ°
+ * @param   direct æ–¹å‘ val è·¯ç¨‹
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void move_by_encoder(int  direct, int val)
 {
-    time = TIME_ISR_CNT;            //»ñÈ¡ÏµÍ³Ê±¼ä
-    double bias = 0, variation;     //±äÁ¿ÉùÃ÷
-    encoder = 0;                    //½«±àÂëÆ÷ÀÛ¼ÓÖµÖÃ0
+    time = TIME_ISR_CNT;            //è·å–ç³»ç»Ÿæ—¶é—´
+    double bias = 0, variation;     //å˜é‡å£°æ˜
+    encoder = 0;                    //å°†ç¼–ç å™¨ç´¯åŠ å€¼ç½®0
     if(direct == 1)
     {
-        if(val < 0)//ÏòÓÒ
+        if(val < 0)//å‘å³
         {
             while(__fabs(val) > encoder )
             {
-                if( (TIME_ISR_CNT - time > 100) && ( __fabs( (val - encoder) ) < ENCODE_THRESHOLD)) goto EXIT_FUNC;  //³¬Ê±´¦Àí£¬±ÜÃâ¿¨ËÀ
-                bias =  -(__fabs(val) - encoder);                       //µÃµ½²îÖµ
-                variation = bias * ENCODER_FACTOR;                              //¼ÆËãµÃ³öÊä³öÖµ¡£P»·
-                variation = variation < - MAX_SPEED ? -MAX_SPEED : variation;   //ÏŞ·ù
-                set_chassis_speed(variation, 0, 0);                             //·ÖÅäËÙ¶È
+                if( (TIME_ISR_CNT - time > 100) && ( __fabs( (val - encoder) ) < ENCODE_THRESHOLD)) goto EXIT_FUNC;  //è¶…æ—¶å¤„ç†ï¼Œé¿å…å¡æ­»
+                bias =  -(__fabs(val) - encoder);                       //å¾—åˆ°å·®å€¼
+                variation = bias * ENCODER_FACTOR;                              //è®¡ç®—å¾—å‡ºè¾“å‡ºå€¼ã€‚Pç¯
+                variation = variation < - MAX_SPEED ? -MAX_SPEED : variation;   //é™å¹…
+                set_chassis_speed(variation, 0, 0);                             //åˆ†é…é€Ÿåº¦
             }
         }
         else
         {
 
-            while(val > encoder)//Ïò×ó
+            while(val > encoder)//å‘å·¦
             {
                 if( (TIME_ISR_CNT - time > 100) && ( (val - encoder ) < ENCODE_THRESHOLD) ) goto EXIT_FUNC;
                 bias = val - encoder;
@@ -194,18 +197,18 @@ void move_by_encoder(int  direct, int val)
     }
     else if(direct == 2)
     {	
-				if(val < 0)//Ïòºó
+				if(val < 0)//å‘å
         {
             while(__fabs(val) > encoder )
             {
-                if( (TIME_ISR_CNT - time > 100) && ( __fabs( (val - encoder) ) < ENCODE_THRESHOLD)) goto EXIT_FUNC;  //³¬Ê±´¦Àí£¬±ÜÃâ¿¨ËÀ
-                bias =  -(__fabs(val) - encoder);                       //µÃµ½²îÖµ
-                variation = bias * ENCODER_FACTOR;                              //¼ÆËãµÃ³öÊä³öÖµ¡£P»·
-                variation = variation < - MAX_SPEED ? -MAX_SPEED : variation;   //ÏŞ·ù
-                set_chassis_speed(0, variation, 0);                             //·ÖÅäËÙ¶È
+                if( (TIME_ISR_CNT - time > 100) && ( __fabs( (val - encoder) ) < ENCODE_THRESHOLD)) goto EXIT_FUNC;  //è¶…æ—¶å¤„ç†ï¼Œé¿å…å¡æ­»
+                bias =  -(__fabs(val) - encoder);                       //å¾—åˆ°å·®å€¼
+                variation = bias * ENCODER_FACTOR;                              //è®¡ç®—å¾—å‡ºè¾“å‡ºå€¼ã€‚Pç¯
+                variation = variation < - MAX_SPEED ? -MAX_SPEED : variation;   //é™å¹…
+                set_chassis_speed(0, variation, 0);                             //åˆ†é…é€Ÿåº¦
             }
         }
-        else  //ÏòÇ°
+        else  //å‘å‰
         {
 
             while(val > encoder)
@@ -221,7 +224,7 @@ void move_by_encoder(int  direct, int val)
     }
     
     EXIT_FUNC:
-        set_chassis_speed(0, 0, 0);//Í£³µ
+        set_chassis_speed(0, 0, 0);//åœè½¦
 }
 
 

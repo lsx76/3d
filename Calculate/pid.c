@@ -4,37 +4,38 @@
 
 float  Iout = 0;
 float  Pout = 0;
-float  Dout = 0;
-/**********************************************************************************************************
-*º¯ Êı Ãû: pid_control
-*¹¦ÄÜËµÃ÷: pid¿ØÖÆÆ÷¼ÆËã
-*ĞÎ    ²Î: pid¿ØÖÆÆ÷Êı¾İ½á¹¹Ìå pid¿ØÖÆÆ÷²ÎÊı
-*·µ »Ø Öµ: Êä³öÁ¿
-**********************************************************************************************************/
+float  Dout = 0; 
+/**********************************************************************
+ * @Name    pid_positional
+ * @declaration : pidæ§åˆ¶å™¨è®¡ç®—
+ * @param   date è¿›è¡Œè®¡ç®—çš„æ•°æ®åŠç»“æ„ä½“  para  pidå‚æ•°
+ * @retval   : data->control_output pidè®¡ç®—ç»“æœ
+ * @author  hoson_stars
+ ***********************************************************************/
 float pid_positional(pid_data_t *data, pid_paramer_t *para)
 {
 	float controller_dt;
-    //¶ÌÂ·Ö±½ÓÊä³öÆÚ´ıÖµ
+    //çŸ­è·¯ç›´æ¥è¾“å‡ºæœŸå¾…å€¼
 	if (data->short_circuit_flag) {
 		data->control_output = data->expect;
 		return data->control_output;
 	}
-	//»ñÈ¡dt
+	//è·å–dt
 	Get_Time_Period(&data->pid_controller_dt);
 	controller_dt = data->pid_controller_dt.Time_Delta / 1000000.0;
-	//µÚÒ»´Î¼ÆËã¼ä¸ôÊ±¼ä½«³öÏÖ¼ä¸ôÊ±¼äºÜ´óµÄÇé¿ö
+	//ç¬¬ä¸€æ¬¡è®¡ç®—é—´éš”æ—¶é—´å°†å‡ºç°é—´éš”æ—¶é—´å¾ˆå¤§çš„æƒ…å†µ
 	if (controller_dt < 0.001f)
 		return 0;
-	//±£´æÉÏ´ÎÆ«²î
+	//ä¿å­˜ä¸Šæ¬¡åå·®
 	data->last_err = data->err;
-	//ÆÚÍû¼õÈ¥·´À¡µÃµ½Æ«²î			  
+	//æœŸæœ›å‡å»åé¦ˆå¾—åˆ°åå·®			  
 	data->err = data->expect - data->feedback;
-	//¼ÆËãÆ«²îÎ¢·Ö
+	//è®¡ç®—åå·®å¾®åˆ†
 	data->dis_err = data->err - data->last_err;
-	//×Ô¶¨ÒåÆ«²îÎ¢·Ö´¦Àí
+	//è‡ªå®šä¹‰åå·®å¾®åˆ†å¤„ç†
 	if (data->err_callback)
 		data->err_callback(data, para);
-	//»ı·ÖÏŞ·ù
+	//ç§¯åˆ†é™å¹…
 	if (para->integrate_max) {
 		if (data->integrate >= para->integrate_max)
 			data->integrate = para->integrate_max;
@@ -42,45 +43,46 @@ float pid_positional(pid_data_t *data, pid_paramer_t *para)
 			data->integrate = -para->integrate_max;
 	}
     data->integrate += para->ki * data->err * controller_dt;
-	//×ÜÊä³ö¼ÆËã
+	//æ€»è¾“å‡ºè®¡ç®—
 	data->control_output = para->kp * data->err
 		+ data->integrate
 		+ para->kd * data->dis_err;
-	//×ÜÊä³öÏŞ·ù
+	//æ€»è¾“å‡ºé™å¹…
 	if (para->control_output_limit) {
 		if (data->control_output >= para->control_output_limit)
 			data->control_output = para->control_output_limit;
 		if (data->control_output <= -para->control_output_limit)
 			data->control_output = -para->control_output_limit;
 	}
-	//·µ»Ø×ÜÊä³ö
+	//è¿”å›æ€»è¾“å‡º
 	return data->control_output;
 }
 
 
 
-/**********************************************************************************************************
-*º¯ Êı Ãû: pid_incremental
-*¹¦ÄÜËµÃ÷: pid¿ØÖÆÆ÷¼ÆËã(ÔöÁ¿Ê½  ÓÃÓÚµç»úĞĞ×ß×îÍâ²ãpid)
-*ĞÎ    ²Î: pid¿ØÖÆÆ÷Êı¾İ½á¹¹Ìå pid¿ØÖÆÆ÷²ÎÊı
-*·µ »Ø Öµ: Êä³öÁ¿
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    pid_positional
+ * @declaration : pidæ§åˆ¶å™¨è®¡ç®—(å¢é‡å¼  ç”¨äºç”µæœºè¡Œèµ°æœ€å¤–å±‚pid)
+ * @param   date è¿›è¡Œè®¡ç®—çš„æ•°æ®åŠç»“æ„ä½“  para  pidå‚æ•°
+ * @retval   : data->control_output pidè®¡ç®—ç»“æœ
+ * @author  hoson_stars
+ ***********************************************************************/
 float pid_incremental(pid_data_t *data, pid_paramer_t *para)
 {
     float controller_dt;
-    //¶ÌÂ·Ö±½ÓÊä³öÆÚ´ıÖµ
+    //çŸ­è·¯ç›´æ¥è¾“å‡ºæœŸå¾…å€¼
     if (data->short_circuit_flag)
     {
         data->control_output = data->expect;
         return data->control_output;
     }
-    //»ñÈ¡dt
+    //è·å–dt
     Get_Time_Period(&data->pid_controller_dt);
     controller_dt = data->pid_controller_dt.Time_Delta / 1000000.0;
-    //µÚÒ»´Î¼ÆËã¼ä¸ôÊ±¼ä½«³öÏÖ¼ä¸ôÊ±¼äºÜ´óµÄÇé¿ö
+    //ç¬¬ä¸€æ¬¡è®¡ç®—é—´éš”æ—¶é—´å°†å‡ºç°é—´éš”æ—¶é—´å¾ˆå¤§çš„æƒ…å†µ
 //    if (controller_dt < 0.001f)
 //        return 0;
-    //¿ªÊ¼½øĞĞÔöÁ¿Ê½¼ÆËã
+    //å¼€å§‹è¿›è¡Œå¢é‡å¼è®¡ç®—
     data->last2_err = data->last_err;
     data->last_err = data->err;
     data->err =  data->expect - data->feedback;
@@ -103,7 +105,7 @@ float pid_incremental(pid_data_t *data, pid_paramer_t *para)
     if(data->expect==0 &&data->err==0) {
         data->control_output = 0;
     } 
-    //·µ»Ø×ÜÊä³ö
+    //è¿”å›æ€»è¾“å‡º
     return data->control_output;
 }
 

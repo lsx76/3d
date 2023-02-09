@@ -3,7 +3,7 @@
 
 pid_data_t imu_pid_data;
 
-/* ÍÓÂİÒÇpid¿ØÖÆ²ÎÊı */
+/* é™€èºä»ªpidæ§åˆ¶å‚æ•° */
 pid_paramer_t imu_pid_paramer = {
     .integrate_max = 500,
     .kp = 2.8,
@@ -13,22 +13,24 @@ pid_paramer_t imu_pid_paramer = {
 }; 
  
 /**********************************************************************
-  * º¯ÊıÃû£ºset_track_status
-  * ÃèÊö: ÉèÖÃÊÇ·ñ¿ªÆôÍÓÂİÒÇ
-  * ²ÎÊı£ºimu_pid_data½á¹¹Ìå   ×´Ì¬
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    set_imu_status
+ * @declaration : è®¾ç½®æ˜¯å¦å¼€å¯é™€èºä»ª
+ * @param   attitude å§¿æ€è§’ç»“æ„ä½“  status çŠ¶æ€
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void set_imu_status(ATTITUDE_t *attitude,bool status)
 {
     attitude->status = status;
 }
-
+  
 /**********************************************************************
-  * º¯ÊıÃû£ºimu_pid_data_init
-  * ÃèÊö: ³õÊ¼ÍÓÂİÒÇpidÊı¾İ
-  * ²ÎÊı£ºimu_pid_data½á¹¹Ìå
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/  
+ * @Name    imu_pid_data_init
+ * @declaration : åˆå§‹é™€èºä»ªpidæ•°æ®
+ * @param   imu_pid_data é™€èºä»ªpidç»“æ„ä½“ 
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void imu_pid_data_init(pid_data_t *imu_pid_data)
 {
     imu_pid_data->expect = 0;
@@ -49,22 +51,24 @@ void imu_pid_data_init(pid_data_t *imu_pid_data)
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºset_turn_angle
-  * ÃèÊö: ÉèÖÃÄ¿±ê½Ç¶È
-  * ²ÎÊı£º×ËÌ¬½ÇÊı¾İ½á¹¹Ìå    Ä¿±ê½Ç¶È
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    set_turn_angle
+ * @declaration : è®¾ç½®ç›®æ ‡è§’åº¦
+ * @param   attitude å§¿æ€è§’ç»“æ„ä½“  target_angle ç›®æ ‡è§’åº¦
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void set_turn_angle(ATTITUDE_t *attitude,int target_angle)
 {
     attitude->target_angle = target_angle;
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºimu_calibration
-  * ÃèÊö: Ğ£×¼µ±Ç°²Î¿¼ÏµzÖá
-  * ²ÎÊı£ºÎŞ    
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    imu_calibration
+ * @declaration : æ ¡å‡†å½“å‰å‚è€ƒç³»zè½´
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void imu_calibration()
 {
     float current_yaw = 0, last_yaw = 0;
@@ -80,17 +84,18 @@ void imu_calibration()
         last_yaw = current_yaw;
     }
     
-    attitude.refer_angle = current_yaw;    //»ù×¼½Ç¶È
+    attitude.refer_angle = current_yaw;    //åŸºå‡†è§’åº¦
     //imu.init_ = current_yaw <= 180 ? -current_yaw : 360 - current_yaw;
   //  HAL_Delay(500);
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºimu_pid
-  * ÃèÊö: ÍÓÂİÒÇpid
-  * ²ÎÊı£º×ËÌ¬½ÇÊı¾İ½á¹¹Ìå    
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    imu_pid
+ * @declaration : é™€èºä»ªpid
+ * @param   attitude å§¿æ€è§’ç»“æ„ä½“
+ * @retval   : pid_positional(&imu_pid_data, &imu_pid_paramer) pidè¾“å‡ºå€¼
+ * @author  hoson_stars
+ ***********************************************************************/
 int imu_pid(ATTITUDE_t *attitude)
 {
     if(attitude->status == true) {
@@ -104,18 +109,19 @@ int imu_pid(ATTITUDE_t *attitude)
 				//printf("yaw=%f\n,refer=%f\n",attitude->yaw,attitude->refer_angle);
 				
         
-        if(__fabs(imu_pid_data.feedback-imu_pid_data.expect)<=1.5) return 0;   //3¶È·¶Î§ÄÚÈÏÎªÒÑ´ïµ½Ä¿±êÖµ
+        if(__fabs(imu_pid_data.feedback-imu_pid_data.expect)<=1.5) return 0;   //3åº¦èŒƒå›´å†…è®¤ä¸ºå·²è¾¾åˆ°ç›®æ ‡å€¼
         else return pid_positional(&imu_pid_data, &imu_pid_paramer);
     }
     else return 0;
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºself_turn
-  * ÃèÊö: ³µÌå×Ô×ª
-  * ²ÎÊı£ºÄ¿±ê×ª¶¯½Ç¶È  ÄæÊ±ÕëÕı Ë³Ê±Õë¸º   
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    self_turn
+ * @declaration : è½¦ä½“è‡ªè½¬
+ * @param   angle ç›®æ ‡è½¬åŠ¨è§’åº¦  é€†æ—¶é’ˆæ­£ é¡ºæ—¶é’ˆè´Ÿ
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void self_turn(int angle)
 {
     imu_calibration();

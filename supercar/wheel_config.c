@@ -1,47 +1,46 @@
 #include "wheel_config.h"
 #include "wheel.h"
 
-/* ¶¨Òåµç»úÊı¾İÀàĞÍ */
+/* å®šä¹‰ç”µæœºæ•°æ®ç±»å‹ */
 motor_t motor1;
 motor_t motor2;
 motor_t motor3;
 motor_t motor4;
 uint16_t val;
-//¶¨ÒåÃæÏòÂÖ×ÓÊ±£¬ÂÖ×ÓË³Ê±Õë×ªÎªÕı×ª£¨A²»Îª0Õı×ª£©
+//å®šä¹‰é¢å‘è½®å­æ—¶ï¼Œè½®å­é¡ºæ—¶é’ˆè½¬ä¸ºæ­£è½¬ï¼ˆAä¸ä¸º0æ­£è½¬ï¼‰
 extern double motor_target[5];
 
-	/**********************************************************************************************************
-*º¯ Êı Ãû: set_motor1val
-*¹¦ÄÜËµÃ÷: ÉèÖÃÄ³¶¨Ê±Æ÷µÄÄ³¸öÍ¨µÀµÄÕ¼¿Õ±È
-*ĞÎ    ²Î: Õ¼¿Õ±È´óĞ¡
-*·µ »Ø Öµ: ÎŞ
-*±¸    ×¢: Îªµ÷ÊÔusmartĞ´µÄº¯Êı£¬ÔÚĞ¡³µĞĞÊ»¹ı³ÌÖĞÎŞÊµ¼ÊÓ¦ÓÃ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    set_motor1val
+ * @declaration : è®¾ç½®æŸå®šæ—¶å™¨çš„æŸä¸ªé€šé“çš„å ç©ºæ¯”  
+ * @param   val  å ç©ºæ¯”å¤§å°  
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void set_motor1val(uint16_t val)
 {
 	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_1,val);
 }
 
-
-	/**********************************************************************************************************
-*º¯ Êı Ãû: set_motor
-*¹¦ÄÜËµÃ÷: ÉèÖÃÄ³¸öµç»úµÄÄ¿±êËÙ¶ÈÖµ
-*ĞÎ    ²Î: Ä¿±êËÙ¶ÈÖµµÄ´óĞ¡
-*·µ »Ø Öµ: ÎŞ
-*±¸    ×¢: ÎªÖğ¸öµç»úµ÷pidĞ´µÄÊÊÓÃÓÚusmartµÄº¯Êı£¬ÔÚĞ¡³µĞĞÊ»¹ı³ÌÖĞÎŞÊµ¼ÊÔËÓÃ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    set_motor
+ * @declaration : è®¾ç½®æŸä¸ªç”µæœºçš„ç›®æ ‡é€Ÿåº¦å€¼  
+ * @param   speed  ç›®æ ‡é€Ÿåº¦å€¼çš„å¤§å°  
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void set_motor(uint16_t speed)
 {
 	motor_target[1]=speed;
 }
 
-
-	/**********************************************************************************************************
-*º¯ Êı Ãû: motor1_Enable
-*¹¦ÄÜËµÃ÷: ³õÊ¼»¯motor1½á¹¹Ìå ²¢Ê¹ÄÜÆä¶ÔÓ¦Ê±ÖÓÓëÖĞ¶Ï
-*ĞÎ    ²Î: motor½á¹¹ÌåµÄµØÖ·
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    motor1_Enable
+ * @declaration : åˆå§‹åŒ–motor1ç»“æ„ä½“   å¹¶ä½¿èƒ½å…¶å¯¹åº”æ—¶é’Ÿä¸ä¸­æ–­
+ * @param   motor  ç”µæœºç»“æ„ä½“  
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void motor1_Enable(motor_t *motor)
 {
     motor->htim_pwm = &htim1;
@@ -62,14 +61,13 @@ void motor1_Enable(motor_t *motor)
     HAL_TIM_IC_Start_IT(motor->htim_ic, motor->ic_channel);
 }
 
-
-/**********************************************************************************************************
-*º¯ Êı Ãû: motor2_Enable
-*¹¦ÄÜËµÃ÷: ³õÊ¼»¯motor2½á¹¹Ìå ²¢Ê¹ÄÜÆä¶ÔÓ¦Ê±ÖÓÓëÖĞ¶Ï
-*ĞÎ    ²Î: motor½á¹¹ÌåµÄµØÖ·
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
-
+/**********************************************************************
+ * @Name    motor2_Enable
+ * @declaration : åˆå§‹åŒ–motor2ç»“æ„ä½“   å¹¶ä½¿èƒ½å…¶å¯¹åº”æ—¶é’Ÿä¸ä¸­æ–­
+ * @param   motor  ç”µæœºç»“æ„ä½“  
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void motor2_Enable(motor_t *motor)
 {
     motor->htim_pwm = &htim1;
@@ -90,12 +88,13 @@ void motor2_Enable(motor_t *motor)
     HAL_TIM_IC_Start_IT(motor->htim_ic, motor->ic_channel);
 }
 
-/**********************************************************************************************************
-*º¯ Êı Ãû: motor3_Enable
-*¹¦ÄÜËµÃ÷: ³õÊ¼»¯motor2½á¹¹Ìå ²¢Ê¹ÄÜÆä¶ÔÓ¦Ê±ÖÓÓëÖĞ¶Ï
-*ĞÎ    ²Î: motor½á¹¹ÌåµÄµØÖ·
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    motor3_Enable
+ * @declaration : åˆå§‹åŒ–motor3ç»“æ„ä½“   å¹¶ä½¿èƒ½å…¶å¯¹åº”æ—¶é’Ÿä¸ä¸­æ–­
+ * @param   motor  ç”µæœºç»“æ„ä½“  
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void motor3_Enable(motor_t *motor)
 {
     motor->htim_pwm = &htim2;
@@ -116,12 +115,13 @@ void motor3_Enable(motor_t *motor)
     HAL_TIM_IC_Start_IT(motor->htim_ic, motor->ic_channel);
 }
 
-/**********************************************************************************************************
-*º¯ Êı Ãû: motor4_Enable
-*¹¦ÄÜËµÃ÷: ³õÊ¼»¯motor2½á¹¹Ìå ²¢Ê¹ÄÜÆä¶ÔÓ¦Ê±ÖÓÓëÖĞ¶Ï
-*ĞÎ    ²Î: motor½á¹¹ÌåµÄµØÖ·
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    motor4_Enable
+ * @declaration : åˆå§‹åŒ–motor4ç»“æ„ä½“   å¹¶ä½¿èƒ½å…¶å¯¹åº”æ—¶é’Ÿä¸ä¸­æ–­
+ * @param   motor  ç”µæœºç»“æ„ä½“  
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void motor4_Enable(motor_t *motor)
 {
     motor->htim_pwm = &htim2;
@@ -142,12 +142,14 @@ void motor4_Enable(motor_t *motor)
     HAL_TIM_IC_Start_IT(motor->htim_ic, motor->ic_channel);
 }
 
+
+//ä»¥ä¸‹ä¸ºå®éªŒä»£ç ï¼Œæ‰¾é€šé“æ—¶å†™çš„
 void car_go(void)
 {
-	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_1,0);//1ÂÖ·´×ª
-	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,0);//2ÂÖÕı×ª
-	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_1,0);//4ÂÖ·´×ª
-	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_3,0);//3ÂÖÕı×ª
+	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_1,0);//1è½®åè½¬
+	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,0);//2è½®æ­£è½¬
+	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_1,0);//4è½®åè½¬
+	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_3,0);//3è½®æ­£è½¬
 	
 	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,0);
 	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_4,0);
@@ -158,10 +160,10 @@ void car_go(void)
 
 void car_left(void)
 {
-	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_1,2000);//1ÂÖÕı×ª
+	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_1,2000);//1è½®æ­£è½¬
 	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,0);
 	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_1,0);
-	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_3,2000);//3ÂÖ·´×ª
+	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_3,2000);//3è½®åè½¬
 	
 	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,0);
 	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_4,2000);
@@ -177,24 +179,24 @@ void car_rightback(void)
 	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_1,0);
 	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_3,0);
 	
-	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,2000);//1ÂÖ·´×ª
-	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_4,2000);//2ÂÖ·´×ª
-	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,2100);//3ÂÖÕı×ª
-	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_4,2000);//4ÂÖÕı×ª
+	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,2000);//1è½®åè½¬
+	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_4,2000);//2è½®åè½¬
+	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,2100);//3è½®æ­£è½¬
+	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_4,2000);//4è½®æ­£è½¬
 
 }
 
 void car_turn(void)
 {
-	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_1,2000);//1ÂÖÕı×ª
-	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,2000);//2ÂÖÕı×ª
+	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_1,2000);//1è½®æ­£è½¬
+	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,2000);//2è½®æ­£è½¬
 	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_1,0);
 	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_3,0);
 	
 	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,0);
 	__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_4,0);
-	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,2100);//3ÂÖÕı×ª
-	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_4,2000);//4ÂÖÕı×ª
+	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,2100);//3è½®æ­£è½¬
+	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_4,2000);//4è½®æ­£è½¬
 
 }
 

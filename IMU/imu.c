@@ -1,21 +1,21 @@
 #include "imu.h"
 
-#define UP_BYTE1 		0x55        //Ö¡Í·1
-#define UP_BYTE2 		0x55        //Ö¡Í·2
-#define UP_ATTITUDE     0x01		//×ËÌ¬½ÇID
+#define UP_BYTE1 		0x55        //å¸§å¤´1
+#define UP_BYTE2 		0x55        //å¸§å¤´2
+#define UP_ATTITUDE     0x01		//å§¿æ€è§’ID
 
-#define RECEIVE_OK  1       //³É¹¦½âÎö±êÖ¾
+#define RECEIVE_OK  1       //æˆåŠŸè§£ææ ‡å¿—
 
-/* Ä£¿éÉÏ´«ÓĞĞ§Êı¾İ³¤¶È */
+/* æ¨¡å—ä¸Šä¼ æœ‰æ•ˆæ•°æ®é•¿åº¦ */
 #define ATKP_MAX_DATA_SIZE 6
 
-/* Ä£¿éÉÏ´«×ËÌ¬½ÇÊı¾İ */
+/* æ¨¡å—ä¸Šä¼ å§¿æ€è§’æ•°æ® */
 ATTITUDE_t  attitude;		  
 
-/* ´®¿Ú½ÓÊÕÊı¾İ°ü */
+/* ä¸²å£æ¥æ”¶æ•°æ®åŒ… */
 IMU901_t    rxPacket_imu901;
 
-/* ´®¿Ú½ÓÊÕÊı¾İ°üÁ÷³Ì */
+/* ä¸²å£æ¥æ”¶æ•°æ®åŒ…æµç¨‹ */
 static enum
 {
     waitForStartByte1,
@@ -26,29 +26,31 @@ static enum
     waitForChksum1,
 } rxState = waitForStartByte1;
 
-/* ÖĞ¶Ï½ÓÊÕ»º³åÇø */
+/* ä¸­æ–­æ¥æ”¶ç¼“å†²åŒº */
 uint8_t IMU901_Rx_buffer;
 
-/* ÊÇ·ñ½ÓÊÕÍÓÂİÒÇÊı¾İ */
+/* æ˜¯å¦æ¥æ”¶é™€èºä»ªæ•°æ® */
 bool if_imu_open = false;
 
 /**********************************************************************
-  * º¯ÊıÃû£ºreceive_imu901_Init
-  * ÃèÊö: ³õÊ¼»¯´®¿Ú5 
-  * ²ÎÊı£ºÍÓÂİÒÇĞÅÏ¢½á¹¹Ìå
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    receive_imu901_Init
+ * @declaration : åˆå§‹åŒ–ä¸²å£5 
+ * @param   attitude å§¿æ€è§’ç»“æ„ä½“
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void receive_imu901_Init(ATTITUDE_t *attitude){
 	attitude->huart=&huart5;
     HAL_UART_Receive_IT(attitude->huart,&IMU901_Rx_buffer, 1);
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºreceive_imu901_IRQ
-  * ÃèÊö: ´®¿Ú5ÖĞ¶Ï½ÓÊÕÒ»¸ö×Ö½Ú
-  * ²ÎÊı£º×ËÌ¬½ÇĞÅÏ¢½á¹¹Ìå
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    receive_imu901_IRQ
+ * @declaration : ä¸²å£5ä¸­æ–­æ¥æ”¶ä¸€ä¸ªå­—èŠ‚
+ * @param   attitude å§¿æ€è§’ç»“æ„ä½“
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void receive_imu901_IRQ(ATTITUDE_t *attitude)
 {
      if(RECEIVE_OK==unpacked_imu901(IMU901_Rx_buffer)) {
@@ -58,11 +60,12 @@ void receive_imu901_IRQ(ATTITUDE_t *attitude)
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºunpacked_imu901
-  * ÃèÊö: ½âÎöimu901´«»Øµ¥¸ö×Ö½ÚĞÅÏ¢
-  * ²ÎÊı£º»º³åÇø
-  * ·µ»ØÖµ:½âÎö³É¹¦ 1      ½âÎöÊ§°Ü 0
-***********************************************************************/
+ * @Name    unpacked_imu901
+ * @declaration : è§£æimu901ä¼ å›å•ä¸ªå­—èŠ‚ä¿¡æ¯
+ * @param   ch æ¥æ”¶åˆ°çš„å­—èŠ‚ 
+ * @retval   : 0/1 è§£æçŠ¶æ€
+ * @author  hoson_stars
+ ***********************************************************************/
 uint8_t unpacked_imu901(uint8_t ch)
 {
     static uint8_t cksum = 0, dataIndex = 0;
@@ -104,7 +107,7 @@ uint8_t unpacked_imu901(uint8_t ch)
             {
                 rxPacket_imu901.dataLen = ch;
                 dataIndex = 0;
-                rxState = (ch > 0) ? waitForData : waitForChksum1;	/*ch=0,Êı¾İ³¤¶ÈÎª0£¬Ğ£Ñé1*/
+                rxState = (ch > 0) ? waitForData : waitForChksum1;	/*ch=0,æ•°æ®é•¿åº¦ä¸º0ï¼Œæ ¡éªŒ1*/
                 cksum += ch;
             }
             else
@@ -127,13 +130,13 @@ uint8_t unpacked_imu901(uint8_t ch)
             break;
 
         case waitForChksum1:
-            if (cksum == ch)	/*!< Ğ£×¼ÕıÈ··µ»Ø1 */
+            if (cksum == ch)	/*!< æ ¡å‡†æ­£ç¡®è¿”å›1 */
             {
                 rxPacket_imu901.checkSum = cksum;
 
                 return 1;
             }
-            else	/*!< Ğ£Ñé´íÎó */
+            else	/*!< æ ¡éªŒé”™è¯¯ */
             {
                 rxState = waitForStartByte1;
             }
@@ -150,14 +153,15 @@ uint8_t unpacked_imu901(uint8_t ch)
 
 
 /**********************************************************************
-  * º¯ÊıÃû£ºGet_imu901
-  * ÃèÊö: »ñÈ¡imu´«»ØÊı¾İÖ¡ÖĞµÄ×ËÌ¬½ÇĞÅÏ¢
-  * ²ÎÊı£ºÍ¨Ñ¶Êı¾İ½á¹¹Ìå
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    Get_imu901
+ * @declaration : è·å–imuä¼ å›æ•°æ®å¸§ä¸­çš„å§¿æ€è§’ä¿¡æ¯
+ * @param   packet é€šè®¯æ•°æ®ç»“æ„ 
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void Get_imu901(IMU901_t *packet)
 {
-    /* ×ËÌ¬½Ç */
+    /* å§¿æ€è§’ */
     if (packet->msgID == UP_ATTITUDE)
     {
 //        int16_t data = (int16_t) (packet->data[1] << 8) | packet->data[0];

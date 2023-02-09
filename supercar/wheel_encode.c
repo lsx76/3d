@@ -2,18 +2,18 @@
 #include "wheel_config.h"
 #include "stdio.h"
 
-#define TIM_PRESCALER 108-1  //·ÖÆµ
-#define MAX_TIM_CNT 65535    //¶¨Ê±Æ÷×î´ó¼ÆÊıÖµ
-#define TIM_IC_FREQ 1000000  //ÆµÂÊ
-#define SPEED_PARAM TIM_IC_FREQ/20    //ËÙ¶ÈÒò×Ó
-#define FILTER 4            //¾ùÖµÂË²¨ ²ÉÑù´ÎÊı    
+#define TIM_PRESCALER 108-1  //åˆ†é¢‘
+#define MAX_TIM_CNT 65535    //å®šæ—¶å™¨æœ€å¤§è®¡æ•°å€¼
+#define TIM_IC_FREQ 1000000  //é¢‘ç‡
+#define SPEED_PARAM TIM_IC_FREQ/20    //é€Ÿåº¦å› å­
+#define FILTER 4            //å‡å€¼æ»¤æ³¢ é‡‡æ ·æ¬¡æ•°    
  
-#define IC_RISE_EDGE 0     //ÉÏÉıÑØ
-#define IC_FALL_EDGE 1     //ÏÂ½µÑØ
-#define FORWARD    1         //Ç°½ø·½Ïò
-#define BACKWARD  -1        //ºóÍË·½Ïò
+#define IC_RISE_EDGE 0     //ä¸Šå‡æ²¿
+#define IC_FALL_EDGE 1     //ä¸‹é™æ²¿
+#define FORWARD    1         //å‰è¿›æ–¹å‘
+#define BACKWARD  -1        //åé€€æ–¹å‘
 
-#define POLE 2               //MG540µç»úĞı×ª´Å³¡µÄ¼«¶ÔÊı
+#define POLE 2               //MG540ç”µæœºæ—‹è½¬ç£åœºçš„æå¯¹æ•°
 
 extern motor_t motor1;
 extern motor_t motor2;
@@ -21,33 +21,34 @@ extern motor_t motor3;
 extern motor_t motor4; 
 
 int encoder = 0;
-
-/**********************************************************************************************************
-*º¯ Êı Ãû: TIM5CaptureChannel1Callback
-*¹¦ÄÜËµÃ÷: Í¨¹ıÊäÈë²¶»ñ¹¦ÄÜ¼ÆËãµç»ú1×ªËÙÓëÆµÂÊ
-*ĞÎ    ²Î: ÎŞ
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
+ 
+/**********************************************************************
+ * @Name    TIM5CaptureChannel1Callback
+ * @declaration : é€šè¿‡è¾“å…¥æ•è·åŠŸèƒ½è®¡ç®—ç”µæœº1è½¬é€Ÿä¸é¢‘ç‡  
+ * @param   None    
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void TIM5CaptureChannel1Callback()
 {
     static uint8_t ic_edge = IC_RISE_EDGE;
-    static uint32_t cap_val_1 = 0;             //µÚÒ»´ÎÉÏÉıÑØCCR¼Ä´æÆ÷ÄÚÖµ
-    static uint32_t cap_val_2 = 0;             //µÚ¶ş´ÎÉÏÉıÑØCCR¼Ä´æÆ÷ÄÚÖµ
-    static int32_t sum_speed = 0;              //¾ùÖµÂË²¨²ÉÑùËÙ¶ÈÖµ×ÜºÍ
-    static int32_t single_speed = 0;           //µ¥¸öËÙ¶ÈÖµ
-    static int32_t average_speed = 0;          //ÂË²¨´¦ÀíºóµÄÆ½¾ùËÙ¶È
-    static int32_t last_average_speed = 0;     //´æ´¢ÉÏÒ»´ÎÂË²¨µÃ³öµÄÆ½¾ùËÙ¶È
-    static uint32_t cap_cnt = 0;               //¼ÇÂ¼²ÉÑù´ÎÊı
-    static int8_t direct = 0;                  //·½Ïò
-    static uint8_t flag_first = 0;              //±êÖ¾ÊÇ·ñÊÇµÚÒ»´ÎÂË²¨
+    static uint32_t cap_val_1 = 0;             //ç¬¬ä¸€æ¬¡ä¸Šå‡æ²¿CCRå¯„å­˜å™¨å†…å€¼
+    static uint32_t cap_val_2 = 0;             //ç¬¬äºŒæ¬¡ä¸Šå‡æ²¿CCRå¯„å­˜å™¨å†…å€¼
+    static int32_t sum_speed = 0;              //å‡å€¼æ»¤æ³¢é‡‡æ ·é€Ÿåº¦å€¼æ€»å’Œ
+    static int32_t single_speed = 0;           //å•ä¸ªé€Ÿåº¦å€¼
+    static int32_t average_speed = 0;          //æ»¤æ³¢å¤„ç†åçš„å¹³å‡é€Ÿåº¦
+    static int32_t last_average_speed = 0;     //å­˜å‚¨ä¸Šä¸€æ¬¡æ»¤æ³¢å¾—å‡ºçš„å¹³å‡é€Ÿåº¦
+    static uint32_t cap_cnt = 0;               //è®°å½•é‡‡æ ·æ¬¡æ•°
+    static int8_t direct = 0;                  //æ–¹å‘
+    static uint8_t flag_first = 0;              //æ ‡å¿—æ˜¯å¦æ˜¯ç¬¬ä¸€æ¬¡æ»¤æ³¢
 
-    if(ic_edge == IC_RISE_EDGE)                //µ±¼ì²âµ½ÉÏÉıÑØ
+    if(ic_edge == IC_RISE_EDGE)                //å½“æ£€æµ‹åˆ°ä¸Šå‡æ²¿
     {
-        motor1.updata = 0;                     //¸üĞÂÖĞ¶ÏÊÂ¼ş¼ÇÂ¼
-        cap_val_1 = HAL_TIM_ReadCapturedValue(motor1.htim_ic, motor1.ic_channel);   //¶ÁÈ¡TIM5 CCR1µÄÖµ
-        ic_edge = IC_FALL_EDGE;                                                     //µÈ´ıÏÂ½µÑØ
+        motor1.updata = 0;                     //æ›´æ–°ä¸­æ–­äº‹ä»¶è®°å½•
+        cap_val_1 = HAL_TIM_ReadCapturedValue(motor1.htim_ic, motor1.ic_channel);   //è¯»å–TIM5 CCR1çš„å€¼
+        ic_edge = IC_FALL_EDGE;                                                     //ç­‰å¾…ä¸‹é™æ²¿
         
-        /* ¼ì²âÁíÒ»¶ËGPIO¿ÚµÄµçÆ½±ä»¯À´ÅĞ¶Ï·½Ïò*/
+        /* æ£€æµ‹å¦ä¸€ç«¯GPIOå£çš„ç”µå¹³å˜åŒ–æ¥åˆ¤æ–­æ–¹å‘*/
         if(HAL_GPIO_ReadPin(motor1.IC_GPIO_Port_v, motor1.IC_Pin_v) == GPIO_PIN_RESET)
         {
             direct = -BACKWARD;
@@ -56,76 +57,77 @@ void TIM5CaptureChannel1Callback()
         {
             direct = -FORWARD;
         }
-        __HAL_TIM_SET_CAPTUREPOLARITY(motor1.htim_ic, motor1.ic_channel, TIM_ICPOLARITY_FALLING);     //×ª»»ÊäÈë²¶»ñ¼«ĞÔÎªÏÂ½µÑØ
+        __HAL_TIM_SET_CAPTUREPOLARITY(motor1.htim_ic, motor1.ic_channel, TIM_ICPOLARITY_FALLING);     //è½¬æ¢è¾“å…¥æ•è·ææ€§ä¸ºä¸‹é™æ²¿
     }
     
-    else                                                                                              //¼ì²âµ½ÏÂ½µÑØ
+    else                                                                                              //æ£€æµ‹åˆ°ä¸‹é™æ²¿
     {
-        cap_val_2 = HAL_TIM_ReadCapturedValue(motor1.htim_ic, motor1.ic_channel);                     //ÔÙ´Î¶ÁÈ¡TIM5 CCR1µÄÖµ
-        if(motor1.updata == 0)                                                                        //ÈôÁ½´Î²¶»ñÖ®¼ä¼ÆÊıÆ÷Î´Òç³ö
+        cap_val_2 = HAL_TIM_ReadCapturedValue(motor1.htim_ic, motor1.ic_channel);                     //å†æ¬¡è¯»å–TIM5 CCR1çš„å€¼
+        if(motor1.updata == 0)                                                                        //è‹¥ä¸¤æ¬¡æ•è·ä¹‹é—´è®¡æ•°å™¨æœªæº¢å‡º
         {
             single_speed = SPEED_PARAM / (cap_val_2 - cap_val_1) * direct;
         }
-        else if(motor1.updata == 1)                                                                   //ÈôÁ½´Î²¶»ñÖ®¼äÒç³öÒ»¸ö¼ÆÊıÖÜÆÚ
+        else if(motor1.updata == 1)                                                                   //è‹¥ä¸¤æ¬¡æ•è·ä¹‹é—´æº¢å‡ºä¸€ä¸ªè®¡æ•°å‘¨æœŸ
         {
             single_speed = SPEED_PARAM / ((MAX_TIM_CNT - cap_val_1) + cap_val_2) * direct;
         }
-        else                                                                                          //ÈôÁ½´Î²¶»ñÖ®¼äÒç³öN¸ö¼ÆÊıÖÜÆÚ
+        else                                                                                          //è‹¥ä¸¤æ¬¡æ•è·ä¹‹é—´æº¢å‡ºNä¸ªè®¡æ•°å‘¨æœŸ
         {
             single_speed = SPEED_PARAM / ((MAX_TIM_CNT - cap_val_1) + MAX_TIM_CNT * (motor1.updata - 1) + cap_val_2) * direct;
         }
         
-        sum_speed += single_speed;                              //²ÉÑùËÙ¶ÈÀÛ¼Ó
-        cap_cnt++;                                              //ÀÛ»ı²ÉÑù´ÎÊı
+        sum_speed += single_speed;                              //é‡‡æ ·é€Ÿåº¦ç´¯åŠ 
+        cap_cnt++;                                              //ç´¯ç§¯é‡‡æ ·æ¬¡æ•°
         
-        if(cap_cnt == FILTER) {                                 //²ÉÑùÍê³É                                   
+        if(cap_cnt == FILTER) {                                 //é‡‡æ ·å®Œæˆ                                   
            cap_cnt = 0;                                     
-           last_average_speed = average_speed;                  //±£´æÉÏÒ»´ÎÂË²¨ºóµÄËÙ¶ÈÖµ  
+           last_average_speed = average_speed;                  //ä¿å­˜ä¸Šä¸€æ¬¡æ»¤æ³¢åçš„é€Ÿåº¦å€¼  
            if(flag_first == 0) {
-               average_speed = (sum_speed+last_average_speed) / FILTER; //µÚÒ»´ÎÂË²¨Ê± last_average_speed=0
+               average_speed = (sum_speed+last_average_speed) / FILTER; //ç¬¬ä¸€æ¬¡æ»¤æ³¢æ—¶ last_average_speed=0
                flag_first = 1;
            }
            else {
-               average_speed = (sum_speed-single_speed+last_average_speed) / FILTER;    //ÍùºóµÄÂË²¨¶¼ÉáÆú×îºóÒ»¸ö²É¼¯µÄËÙ¶È Ìæ»»ÎªÉÏÒ»´ÎÂË²¨ºóµÄËÙ¶È
+               average_speed = (sum_speed-single_speed+last_average_speed) / FILTER;    //å¾€åçš„æ»¤æ³¢éƒ½èˆå¼ƒæœ€åä¸€ä¸ªé‡‡é›†çš„é€Ÿåº¦ æ›¿æ¢ä¸ºä¸Šä¸€æ¬¡æ»¤æ³¢åçš„é€Ÿåº¦
            }
            
-           if(!(__fabs(average_speed + last_average_speed) < 5)) {              //ÈôÉÏÒ»´ÎÓëÕâÒ»´Î²îÖµ¹ı´ó²¢ÇÒÏà¼Óºó½Ó½ü0 ËµÃ÷·½ÏòÖµ·¢ÉúÌø±ä
+           if(!(__fabs(average_speed + last_average_speed) < 5)) {              //è‹¥ä¸Šä¸€æ¬¡ä¸è¿™ä¸€æ¬¡å·®å€¼è¿‡å¤§å¹¶ä¸”ç›¸åŠ åæ¥è¿‘0 è¯´æ˜æ–¹å‘å€¼å‘ç”Ÿè·³å˜
                 motor1.freq =  average_speed ;
            } 
-           cap_cnt = 0;             //²ÉÑù´¦ÀíÍêºó  ½«Í³¼Æ²ÉÑù´ÎÊıµÄÖµÇå0 µÈ´ıÏÂÒ»´Î²ÉÑù´¦Àí
-           sum_speed = 0;           //²ÉÑù´¦ÀíÍêºó  ½«²ÉÑù×ÜºÍµÄÖµÇå0 µÈ´ıÏÂÒ»´Î²ÉÑù´¦Àí
+           cap_cnt = 0;             //é‡‡æ ·å¤„ç†å®Œå  å°†ç»Ÿè®¡é‡‡æ ·æ¬¡æ•°çš„å€¼æ¸…0 ç­‰å¾…ä¸‹ä¸€æ¬¡é‡‡æ ·å¤„ç†
+           sum_speed = 0;           //é‡‡æ ·å¤„ç†å®Œå  å°†é‡‡æ ·æ€»å’Œçš„å€¼æ¸…0 ç­‰å¾…ä¸‹ä¸€æ¬¡é‡‡æ ·å¤„ç†
         }
-        __HAL_TIM_SET_CAPTUREPOLARITY(motor1.htim_ic, motor1.ic_channel, TIM_ICPOLARITY_RISING);      //×ª»»ÊäÈë²¶»ñ¼«ĞÔÎªÉÏÉıÑØ£¬µÈ´ıÏÂÒ»´Î²ÉÑù
-        ic_edge = IC_RISE_EDGE;     //µÈ´ıÏÂÒ»¸öÖÜÆÚµÄµÚÒ»¸öÉÏÉıÑØ
+        __HAL_TIM_SET_CAPTUREPOLARITY(motor1.htim_ic, motor1.ic_channel, TIM_ICPOLARITY_RISING);      //è½¬æ¢è¾“å…¥æ•è·ææ€§ä¸ºä¸Šå‡æ²¿ï¼Œç­‰å¾…ä¸‹ä¸€æ¬¡é‡‡æ ·
+        ic_edge = IC_RISE_EDGE;     //ç­‰å¾…ä¸‹ä¸€ä¸ªå‘¨æœŸçš„ç¬¬ä¸€ä¸ªä¸Šå‡æ²¿
     }
 }
 
-/**********************************************************************************************************
-*º¯ Êı Ãû: TIM5CaptureChannel3Callback
-*¹¦ÄÜËµÃ÷: Í¨¹ıÊäÈë²¶»ñ¹¦ÄÜ¼ÆËãµç»ú2×ªËÙÓëÆµÂÊ
-*ĞÎ    ²Î: ÎŞ
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    TIM5CaptureChannel3Callback
+ * @declaration : é€šè¿‡è¾“å…¥æ•è·åŠŸèƒ½è®¡ç®—ç”µæœº2è½¬é€Ÿä¸é¢‘ç‡  
+ * @param   None    
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void TIM5CaptureChannel3Callback()
 {
     static uint8_t ic_edge = IC_RISE_EDGE;
-    static uint32_t cap_val_1 = 0;             //µÚÒ»´ÎÉÏÉıÑØCCR¼Ä´æÆ÷ÄÚÖµ
-    static uint32_t cap_val_2 = 0;             //µÚ¶ş´ÎÉÏÉıÑØCCR¼Ä´æÆ÷ÄÚÖµ
-    static int32_t sum_speed = 0;              //¾ùÖµÂË²¨²ÉÑùËÙ¶ÈÖµ×ÜºÍ
-    static int32_t single_speed = 0;           //µ¥¸öËÙ¶ÈÖµ
-    static int32_t average_speed = 0;          //ÂË²¨´¦ÀíºóµÄÆ½¾ùËÙ¶È
-    static int32_t last_average_speed = 0;     //´æ´¢ÉÏÒ»´ÎÂË²¨µÃ³öµÄÆ½¾ùËÙ¶È
-    static uint32_t cap_cnt = 0;               //¼ÇÂ¼²ÉÑù´ÎÊı
-    static int8_t direct = 0;                  //·½Ïò
-    static uint8_t flag_first = 0;             //±êÖ¾ÊÇ·ñÊÇµÚÒ»´ÎÂË²¨
+    static uint32_t cap_val_1 = 0;             //ç¬¬ä¸€æ¬¡ä¸Šå‡æ²¿CCRå¯„å­˜å™¨å†…å€¼
+    static uint32_t cap_val_2 = 0;             //ç¬¬äºŒæ¬¡ä¸Šå‡æ²¿CCRå¯„å­˜å™¨å†…å€¼
+    static int32_t sum_speed = 0;              //å‡å€¼æ»¤æ³¢é‡‡æ ·é€Ÿåº¦å€¼æ€»å’Œ
+    static int32_t single_speed = 0;           //å•ä¸ªé€Ÿåº¦å€¼
+    static int32_t average_speed = 0;          //æ»¤æ³¢å¤„ç†åçš„å¹³å‡é€Ÿåº¦
+    static int32_t last_average_speed = 0;     //å­˜å‚¨ä¸Šä¸€æ¬¡æ»¤æ³¢å¾—å‡ºçš„å¹³å‡é€Ÿåº¦
+    static uint32_t cap_cnt = 0;               //è®°å½•é‡‡æ ·æ¬¡æ•°
+    static int8_t direct = 0;                  //æ–¹å‘
+    static uint8_t flag_first = 0;             //æ ‡å¿—æ˜¯å¦æ˜¯ç¬¬ä¸€æ¬¡æ»¤æ³¢
 
-    if(ic_edge == IC_RISE_EDGE)                //µ±¼ì²âµ½ÉÏÉıÑØ
+    if(ic_edge == IC_RISE_EDGE)                //å½“æ£€æµ‹åˆ°ä¸Šå‡æ²¿
     {
-        motor2.updata = 0;                     //¸üĞÂÖĞ¶ÏÊÂ¼ş¼ÇÂ¼
-        cap_val_1 = HAL_TIM_ReadCapturedValue(motor2.htim_ic, motor2.ic_channel);   //¶ÁÈ¡TIM5 CCR3µÄÖµ
-        ic_edge = IC_FALL_EDGE;                                                     //µÈ´ıÏÂ½µÑØ
+        motor2.updata = 0;                     //æ›´æ–°ä¸­æ–­äº‹ä»¶è®°å½•
+        cap_val_1 = HAL_TIM_ReadCapturedValue(motor2.htim_ic, motor2.ic_channel);   //è¯»å–TIM5 CCR3çš„å€¼
+        ic_edge = IC_FALL_EDGE;                                                     //ç­‰å¾…ä¸‹é™æ²¿
 
-        /* ¼ì²âÁíÒ»¶ËGPIO¿ÚµÄµçÆ½±ä»¯À´ÅĞ¶Ï·½Ïò*/
+        /* æ£€æµ‹å¦ä¸€ç«¯GPIOå£çš„ç”µå¹³å˜åŒ–æ¥åˆ¤æ–­æ–¹å‘*/
         if(HAL_GPIO_ReadPin(motor2.IC_GPIO_Port_v, motor2.IC_Pin_v) == GPIO_PIN_RESET)
         {
             direct = -BACKWARD;
@@ -134,78 +136,79 @@ void TIM5CaptureChannel3Callback()
         {
             direct = -FORWARD;
         }
-        __HAL_TIM_SET_CAPTUREPOLARITY(motor2.htim_ic, motor2.ic_channel, TIM_ICPOLARITY_FALLING);     //×ª»»ÊäÈë²¶»ñ¼«ĞÔÎªÏÂ½µÑØ
+        __HAL_TIM_SET_CAPTUREPOLARITY(motor2.htim_ic, motor2.ic_channel, TIM_ICPOLARITY_FALLING);     //è½¬æ¢è¾“å…¥æ•è·ææ€§ä¸ºä¸‹é™æ²¿
     }
     
-    else                                                                                              //¼ì²âµ½ÏÂ½µÑØ
+    else                                                                                              //æ£€æµ‹åˆ°ä¸‹é™æ²¿
     {
-        cap_val_2 = HAL_TIM_ReadCapturedValue(motor2.htim_ic, motor2.ic_channel);                     //ÔÙ´Î¶ÁÈ¡TIM5 CCR3µÄÖµ
-        if(motor2.updata == 0)                                                                        //ÈôÁ½´Î²¶»ñÖ®¼ä¼ÆÊıÆ÷Î´Òç³ö
+        cap_val_2 = HAL_TIM_ReadCapturedValue(motor2.htim_ic, motor2.ic_channel);                     //å†æ¬¡è¯»å–TIM5 CCR3çš„å€¼
+        if(motor2.updata == 0)                                                                        //è‹¥ä¸¤æ¬¡æ•è·ä¹‹é—´è®¡æ•°å™¨æœªæº¢å‡º
         {
             single_speed = SPEED_PARAM / (cap_val_2 - cap_val_1) * direct;
         }
-        else if(motor2.updata == 1)                                                                   //ÈôÁ½´Î²¶»ñÖ®¼äÒç³öÒ»¸ö¼ÆÊıÖÜÆÚ
+        else if(motor2.updata == 1)                                                                   //è‹¥ä¸¤æ¬¡æ•è·ä¹‹é—´æº¢å‡ºä¸€ä¸ªè®¡æ•°å‘¨æœŸ
         {
             single_speed = SPEED_PARAM / ((MAX_TIM_CNT - cap_val_1) + cap_val_2) * direct;
         }
-        else                                                                                          //ÈôÁ½´Î²¶»ñÖ®¼äÒç³öN¸ö¼ÆÊıÖÜÆÚ
+        else                                                                                          //è‹¥ä¸¤æ¬¡æ•è·ä¹‹é—´æº¢å‡ºNä¸ªè®¡æ•°å‘¨æœŸ
         {
             single_speed = SPEED_PARAM / ((MAX_TIM_CNT - cap_val_1) + MAX_TIM_CNT * (motor2.updata - 1) + cap_val_2) * direct;
         }
         
-        sum_speed += single_speed;                              //²ÉÑùÖÜÆÚÀÛ¼Ó
-        cap_cnt++;                                              //ÀÛ»ı²ÉÑù´ÎÊı
+        sum_speed += single_speed;                              //é‡‡æ ·å‘¨æœŸç´¯åŠ 
+        cap_cnt++;                                              //ç´¯ç§¯é‡‡æ ·æ¬¡æ•°
         
-        if(cap_cnt == FILTER) {                                 //²ÉÑùÍê³É                                   
+        if(cap_cnt == FILTER) {                                 //é‡‡æ ·å®Œæˆ                                   
            cap_cnt = 0;                                     
-           last_average_speed = average_speed;                  //±£´æÉÏÒ»´ÎÂË²¨ºóµÄËÙ¶ÈÖµ
+           last_average_speed = average_speed;                  //ä¿å­˜ä¸Šä¸€æ¬¡æ»¤æ³¢åçš„é€Ÿåº¦å€¼
            if(flag_first == 0) {
-               average_speed = (sum_speed+last_average_speed) / FILTER; //µÚÒ»´ÎÂË²¨Ê± last_average_speed=0
+               average_speed = (sum_speed+last_average_speed) / FILTER; //ç¬¬ä¸€æ¬¡æ»¤æ³¢æ—¶ last_average_speed=0
                flag_first = 1;
            }
            else {
-               average_speed = (sum_speed-single_speed+last_average_speed) / FILTER;    //ÍùºóµÄÂË²¨¶¼ÉáÆú×îºóÒ»¸ö²É¼¯µÄËÙ¶È Ìæ»»ÎªÉÏÒ»´ÎÂË²¨ºóµÄËÙ¶È
+               average_speed = (sum_speed-single_speed+last_average_speed) / FILTER;    //å¾€åçš„æ»¤æ³¢éƒ½èˆå¼ƒæœ€åä¸€ä¸ªé‡‡é›†çš„é€Ÿåº¦ æ›¿æ¢ä¸ºä¸Šä¸€æ¬¡æ»¤æ³¢åçš„é€Ÿåº¦
            }
            
-           if(!(__fabs(average_speed + last_average_speed) < 5)) {              //ÈôÉÏÒ»´ÎÓëÕâÒ»´Î²îÖµ¹ı´ó²¢ÇÒÏà¼Óºó½Ó½ü0 ËµÃ÷·½ÏòÖµ·¢ÉúÌø±ä
+           if(!(__fabs(average_speed + last_average_speed) < 5)) {              //è‹¥ä¸Šä¸€æ¬¡ä¸è¿™ä¸€æ¬¡å·®å€¼è¿‡å¤§å¹¶ä¸”ç›¸åŠ åæ¥è¿‘0 è¯´æ˜æ–¹å‘å€¼å‘ç”Ÿè·³å˜
                 motor2.freq =  average_speed ;
              
            } 
-           cap_cnt = 0;             //²ÉÑù´¦ÀíÍêºó  ½«Í³¼Æ²ÉÑù´ÎÊıµÄÖµÇå0 µÈ´ıÏÂÒ»´Î²ÉÑù´¦Àí
-           sum_speed = 0;           //²ÉÑù´¦ÀíÍêºó  ½«²ÉÑù×ÜºÍµÄÖµÇå0 µÈ´ıÏÂÒ»´Î²ÉÑù´¦Àí
+           cap_cnt = 0;             //é‡‡æ ·å¤„ç†å®Œå  å°†ç»Ÿè®¡é‡‡æ ·æ¬¡æ•°çš„å€¼æ¸…0 ç­‰å¾…ä¸‹ä¸€æ¬¡é‡‡æ ·å¤„ç†
+           sum_speed = 0;           //é‡‡æ ·å¤„ç†å®Œå  å°†é‡‡æ ·æ€»å’Œçš„å€¼æ¸…0 ç­‰å¾…ä¸‹ä¸€æ¬¡é‡‡æ ·å¤„ç†
         }
-        __HAL_TIM_SET_CAPTUREPOLARITY(motor2.htim_ic, motor2.ic_channel, TIM_ICPOLARITY_RISING);      //×ª»»ÊäÈë²¶»ñ¼«ĞÔÎªÉÏÉıÑØ£¬µÈ´ıÏÂÒ»´Î²ÉÑù
-        ic_edge = IC_RISE_EDGE;     //µÈ´ıÏÂÒ»¸öÖÜÆÚµÄµÚÒ»¸öÉÏÉıÑØ
+        __HAL_TIM_SET_CAPTUREPOLARITY(motor2.htim_ic, motor2.ic_channel, TIM_ICPOLARITY_RISING);      //è½¬æ¢è¾“å…¥æ•è·ææ€§ä¸ºä¸Šå‡æ²¿ï¼Œç­‰å¾…ä¸‹ä¸€æ¬¡é‡‡æ ·
+        ic_edge = IC_RISE_EDGE;     //ç­‰å¾…ä¸‹ä¸€ä¸ªå‘¨æœŸçš„ç¬¬ä¸€ä¸ªä¸Šå‡æ²¿
         
     }
 }
 
-/**********************************************************************************************************
-*º¯ Êı Ãû: TIM3CaptureChannel1Callback
-*¹¦ÄÜËµÃ÷: Í¨¹ıÊäÈë²¶»ñ¹¦ÄÜ¼ÆËãµç»ú3×ªËÙÓëÆµÂÊ
-*ĞÎ    ²Î: ÎŞ
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    TIM3CaptureChannel1Callback
+ * @declaration : é€šè¿‡è¾“å…¥æ•è·åŠŸèƒ½è®¡ç®—ç”µæœº3è½¬é€Ÿä¸é¢‘ç‡  
+ * @param   None    
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void TIM3CaptureChannel1Callback()
 {
    static uint8_t ic_edge = IC_RISE_EDGE;
-    static uint32_t cap_val_1 = 0;             //µÚÒ»´ÎÉÏÉıÑØCCR¼Ä´æÆ÷ÄÚÖµ
-    static uint32_t cap_val_2 = 0;             //µÚ¶ş´ÎÉÏÉıÑØCCR¼Ä´æÆ÷ÄÚÖµ
-    static int32_t sum_speed = 0;              //¾ùÖµÂË²¨²ÉÑùËÙ¶ÈÖµ×ÜºÍ
-    static int32_t single_speed = 0;           //µ¥¸öËÙ¶ÈÖµ
-    static int32_t average_speed = 0;          //ÂË²¨´¦ÀíºóµÄÆ½¾ùËÙ¶È
-    static int32_t last_average_speed = 0;     //´æ´¢ÉÏÒ»´ÎÂË²¨µÃ³öµÄÆ½¾ùËÙ¶È
-    static uint32_t cap_cnt = 0;               //¼ÇÂ¼²ÉÑù´ÎÊı
-    static int8_t direct = 0;                  //·½Ïò
-    static uint8_t flag_first = 0;             //±êÖ¾ÊÇ·ñÊÇµÚÒ»´ÎÂË²¨
+    static uint32_t cap_val_1 = 0;             //ç¬¬ä¸€æ¬¡ä¸Šå‡æ²¿CCRå¯„å­˜å™¨å†…å€¼
+    static uint32_t cap_val_2 = 0;             //ç¬¬äºŒæ¬¡ä¸Šå‡æ²¿CCRå¯„å­˜å™¨å†…å€¼
+    static int32_t sum_speed = 0;              //å‡å€¼æ»¤æ³¢é‡‡æ ·é€Ÿåº¦å€¼æ€»å’Œ
+    static int32_t single_speed = 0;           //å•ä¸ªé€Ÿåº¦å€¼
+    static int32_t average_speed = 0;          //æ»¤æ³¢å¤„ç†åçš„å¹³å‡é€Ÿåº¦
+    static int32_t last_average_speed = 0;     //å­˜å‚¨ä¸Šä¸€æ¬¡æ»¤æ³¢å¾—å‡ºçš„å¹³å‡é€Ÿåº¦
+    static uint32_t cap_cnt = 0;               //è®°å½•é‡‡æ ·æ¬¡æ•°
+    static int8_t direct = 0;                  //æ–¹å‘
+    static uint8_t flag_first = 0;             //æ ‡å¿—æ˜¯å¦æ˜¯ç¬¬ä¸€æ¬¡æ»¤æ³¢
 
-    if(ic_edge == IC_RISE_EDGE)                //µ±¼ì²âµ½ÉÏÉıÑØ
+    if(ic_edge == IC_RISE_EDGE)                //å½“æ£€æµ‹åˆ°ä¸Šå‡æ²¿
     {
-        motor3.updata = 0;                     //¸üĞÂÖĞ¶ÏÊÂ¼ş¼ÇÂ¼
-        cap_val_1 = HAL_TIM_ReadCapturedValue(motor3.htim_ic, motor3.ic_channel);   //¶ÁÈ¡TIM3 CCR1µÄÖµ
-        ic_edge = IC_FALL_EDGE;                                                     //µÈ´ıÏÂ½µÑØ
+        motor3.updata = 0;                     //æ›´æ–°ä¸­æ–­äº‹ä»¶è®°å½•
+        cap_val_1 = HAL_TIM_ReadCapturedValue(motor3.htim_ic, motor3.ic_channel);   //è¯»å–TIM3 CCR1çš„å€¼
+        ic_edge = IC_FALL_EDGE;                                                     //ç­‰å¾…ä¸‹é™æ²¿
 
-        /* ¼ì²âÁíÒ»¶ËGPIO¿ÚµÄµçÆ½±ä»¯À´ÅĞ¶Ï·½Ïò*/
+        /* æ£€æµ‹å¦ä¸€ç«¯GPIOå£çš„ç”µå¹³å˜åŒ–æ¥åˆ¤æ–­æ–¹å‘*/
         if(HAL_GPIO_ReadPin(motor3.IC_GPIO_Port_v, motor3.IC_Pin_v) == GPIO_PIN_RESET)
         {
             direct = BACKWARD;
@@ -214,77 +217,78 @@ void TIM3CaptureChannel1Callback()
         {
             direct = FORWARD;
         }
-        __HAL_TIM_SET_CAPTUREPOLARITY(motor3.htim_ic, motor3.ic_channel, TIM_ICPOLARITY_FALLING);     //×ª»»ÊäÈë²¶»ñ¼«ĞÔÎªÏÂ½µÑØ
+        __HAL_TIM_SET_CAPTUREPOLARITY(motor3.htim_ic, motor3.ic_channel, TIM_ICPOLARITY_FALLING);     //è½¬æ¢è¾“å…¥æ•è·ææ€§ä¸ºä¸‹é™æ²¿
     }
     
-    else                                                                                              //¼ì²âµ½ÏÂ½µÑØ
+    else                                                                                              //æ£€æµ‹åˆ°ä¸‹é™æ²¿
     {
-        cap_val_2 = HAL_TIM_ReadCapturedValue(motor3.htim_ic, motor3.ic_channel);                     //ÔÙ´Î¶ÁÈ¡TIM3 CCR1µÄÖµ
-        if(motor3.updata == 0)                                                                        //ÈôÁ½´Î²¶»ñÖ®¼ä¼ÆÊıÆ÷Î´Òç³ö
+        cap_val_2 = HAL_TIM_ReadCapturedValue(motor3.htim_ic, motor3.ic_channel);                     //å†æ¬¡è¯»å–TIM3 CCR1çš„å€¼
+        if(motor3.updata == 0)                                                                        //è‹¥ä¸¤æ¬¡æ•è·ä¹‹é—´è®¡æ•°å™¨æœªæº¢å‡º
         {
             single_speed = SPEED_PARAM / (cap_val_2 - cap_val_1) * direct;
         }
-        else if(motor3.updata == 1)                                                                   //ÈôÁ½´Î²¶»ñÖ®¼äÒç³öÒ»¸ö¼ÆÊıÖÜÆÚ
+        else if(motor3.updata == 1)                                                                   //è‹¥ä¸¤æ¬¡æ•è·ä¹‹é—´æº¢å‡ºä¸€ä¸ªè®¡æ•°å‘¨æœŸ
         {
             single_speed = SPEED_PARAM / ((MAX_TIM_CNT - cap_val_1) + cap_val_2) * direct;
         }
-        else                                                                                          //ÈôÁ½´Î²¶»ñÖ®¼äÒç³öN¸ö¼ÆÊıÖÜÆÚ
+        else                                                                                          //è‹¥ä¸¤æ¬¡æ•è·ä¹‹é—´æº¢å‡ºNä¸ªè®¡æ•°å‘¨æœŸ
         {
             single_speed = SPEED_PARAM / ((MAX_TIM_CNT - cap_val_1) + MAX_TIM_CNT * (motor3.updata - 1) + cap_val_2) * direct;
         }
         
-        sum_speed += single_speed;                              //²ÉÑùÖÜÆÚÀÛ¼Ó
-        cap_cnt++;                                              //ÀÛ»ı²ÉÑù´ÎÊı
+        sum_speed += single_speed;                              //é‡‡æ ·å‘¨æœŸç´¯åŠ 
+        cap_cnt++;                                              //ç´¯ç§¯é‡‡æ ·æ¬¡æ•°
         
-        if(cap_cnt == FILTER) {                                 //²ÉÑùÍê³É                                   
+        if(cap_cnt == FILTER) {                                 //é‡‡æ ·å®Œæˆ                                   
            cap_cnt = 0;                                     
-           last_average_speed = average_speed;                  //±£´æÉÏÒ»´ÎÂË²¨ºóµÄËÙ¶ÈÖµ
+           last_average_speed = average_speed;                  //ä¿å­˜ä¸Šä¸€æ¬¡æ»¤æ³¢åçš„é€Ÿåº¦å€¼
            if(flag_first == 0) {
-               average_speed = (sum_speed+last_average_speed) / FILTER; //µÚÒ»´ÎÂË²¨Ê± last_average_speed=0
+               average_speed = (sum_speed+last_average_speed) / FILTER; //ç¬¬ä¸€æ¬¡æ»¤æ³¢æ—¶ last_average_speed=0
                flag_first = 1;
            }
            else {
-               average_speed = (sum_speed-single_speed+last_average_speed) / FILTER;    //ÍùºóµÄÂË²¨¶¼ÉáÆú×îºóÒ»¸ö²É¼¯µÄËÙ¶È Ìæ»»ÎªÉÏÒ»´ÎÂË²¨ºóµÄËÙ¶È
+               average_speed = (sum_speed-single_speed+last_average_speed) / FILTER;    //å¾€åçš„æ»¤æ³¢éƒ½èˆå¼ƒæœ€åä¸€ä¸ªé‡‡é›†çš„é€Ÿåº¦ æ›¿æ¢ä¸ºä¸Šä¸€æ¬¡æ»¤æ³¢åçš„é€Ÿåº¦
            }
            
-           if(!(__fabs(average_speed + last_average_speed) < 5)) {              //ÈôÉÏÒ»´ÎÓëÕâÒ»´Î²îÖµ¹ı´ó²¢ÇÒÏà¼Óºó½Ó½ü0 ËµÃ÷·½ÏòÖµ·¢ÉúÌø±ä
+           if(!(__fabs(average_speed + last_average_speed) < 5)) {              //è‹¥ä¸Šä¸€æ¬¡ä¸è¿™ä¸€æ¬¡å·®å€¼è¿‡å¤§å¹¶ä¸”ç›¸åŠ åæ¥è¿‘0 è¯´æ˜æ–¹å‘å€¼å‘ç”Ÿè·³å˜
                 motor3.freq =  average_speed ;
            } 
-           cap_cnt = 0;             //²ÉÑù´¦ÀíÍêºó  ½«Í³¼Æ²ÉÑù´ÎÊıµÄÖµÇå0 µÈ´ıÏÂÒ»´Î²ÉÑù´¦Àí
-           sum_speed = 0;           //²ÉÑù´¦ÀíÍêºó  ½«²ÉÑù×ÜºÍµÄÖµÇå0 µÈ´ıÏÂÒ»´Î²ÉÑù´¦Àí
+           cap_cnt = 0;             //é‡‡æ ·å¤„ç†å®Œå  å°†ç»Ÿè®¡é‡‡æ ·æ¬¡æ•°çš„å€¼æ¸…0 ç­‰å¾…ä¸‹ä¸€æ¬¡é‡‡æ ·å¤„ç†
+           sum_speed = 0;           //é‡‡æ ·å¤„ç†å®Œå  å°†é‡‡æ ·æ€»å’Œçš„å€¼æ¸…0 ç­‰å¾…ä¸‹ä¸€æ¬¡é‡‡æ ·å¤„ç†
         }
-        __HAL_TIM_SET_CAPTUREPOLARITY(motor3.htim_ic, motor3.ic_channel, TIM_ICPOLARITY_RISING);      //×ª»»ÊäÈë²¶»ñ¼«ĞÔÎªÉÏÉıÑØ£¬µÈ´ıÏÂÒ»´Î²ÉÑù
-        ic_edge = IC_RISE_EDGE;     //µÈ´ıÏÂÒ»¸öÖÜÆÚµÄµÚÒ»¸öÉÏÉıÑØ
+        __HAL_TIM_SET_CAPTUREPOLARITY(motor3.htim_ic, motor3.ic_channel, TIM_ICPOLARITY_RISING);      //è½¬æ¢è¾“å…¥æ•è·ææ€§ä¸ºä¸Šå‡æ²¿ï¼Œç­‰å¾…ä¸‹ä¸€æ¬¡é‡‡æ ·
+        ic_edge = IC_RISE_EDGE;     //ç­‰å¾…ä¸‹ä¸€ä¸ªå‘¨æœŸçš„ç¬¬ä¸€ä¸ªä¸Šå‡æ²¿
         
     }
 }
 
-/**********************************************************************************************************
-*º¯ Êı Ãû: TIM3CaptureChannel3Callback
-*¹¦ÄÜËµÃ÷: Í¨¹ıÊäÈë²¶»ñ¹¦ÄÜ¼ÆËãµç»ú4×ªËÙÓëÆµÂÊ
-*ĞÎ    ²Î: ÎŞ
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    TIM3CaptureChannel3Callback
+ * @declaration : é€šè¿‡è¾“å…¥æ•è·åŠŸèƒ½è®¡ç®—ç”µæœº4è½¬é€Ÿä¸é¢‘ç‡  
+ * @param   None    
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void TIM3CaptureChannel3Callback()
 {
    static uint8_t ic_edge = IC_RISE_EDGE;
-    static uint32_t cap_val_1 = 0;             //µÚÒ»´ÎÉÏÉıÑØCCR¼Ä´æÆ÷ÄÚÖµ
-    static uint32_t cap_val_2 = 0;             //µÚ¶ş´ÎÉÏÉıÑØCCR¼Ä´æÆ÷ÄÚÖµ
-    static int32_t sum_speed = 0;              //¾ùÖµÂË²¨²ÉÑùËÙ¶ÈÖµ×ÜºÍ
-    static int32_t single_speed = 0;           //µ¥¸öËÙ¶ÈÖµ
-    static int32_t average_speed = 0;          //ÂË²¨´¦ÀíºóµÄÆ½¾ùËÙ¶È
-    static int32_t last_average_speed = 0;     //´æ´¢ÉÏÒ»´ÎÂË²¨µÃ³öµÄÆ½¾ùËÙ¶È
-    static uint32_t cap_cnt = 0;               //¼ÇÂ¼²ÉÑù´ÎÊı
-    static int8_t direct = 0;                  //·½Ïò
-    static uint8_t flag_first = 0;             //±êÖ¾ÊÇ·ñÊÇµÚÒ»´ÎÂË²¨
+    static uint32_t cap_val_1 = 0;             //ç¬¬ä¸€æ¬¡ä¸Šå‡æ²¿CCRå¯„å­˜å™¨å†…å€¼
+    static uint32_t cap_val_2 = 0;             //ç¬¬äºŒæ¬¡ä¸Šå‡æ²¿CCRå¯„å­˜å™¨å†…å€¼
+    static int32_t sum_speed = 0;              //å‡å€¼æ»¤æ³¢é‡‡æ ·é€Ÿåº¦å€¼æ€»å’Œ
+    static int32_t single_speed = 0;           //å•ä¸ªé€Ÿåº¦å€¼
+    static int32_t average_speed = 0;          //æ»¤æ³¢å¤„ç†åçš„å¹³å‡é€Ÿåº¦
+    static int32_t last_average_speed = 0;     //å­˜å‚¨ä¸Šä¸€æ¬¡æ»¤æ³¢å¾—å‡ºçš„å¹³å‡é€Ÿåº¦
+    static uint32_t cap_cnt = 0;               //è®°å½•é‡‡æ ·æ¬¡æ•°
+    static int8_t direct = 0;                  //æ–¹å‘
+    static uint8_t flag_first = 0;             //æ ‡å¿—æ˜¯å¦æ˜¯ç¬¬ä¸€æ¬¡æ»¤æ³¢
 
-    if(ic_edge == IC_RISE_EDGE)                //µ±¼ì²âµ½ÉÏÉıÑØ
+    if(ic_edge == IC_RISE_EDGE)                //å½“æ£€æµ‹åˆ°ä¸Šå‡æ²¿
     {
-        motor4.updata = 0;                     //¸üĞÂÖĞ¶ÏÊÂ¼ş¼ÇÂ¼
-        cap_val_1 = HAL_TIM_ReadCapturedValue(motor4.htim_ic, motor4.ic_channel);   //¶ÁÈ¡TIM3 CCR3µÄÖµ
-        ic_edge = IC_FALL_EDGE;                                                     //µÈ´ıÏÂ½µÑØ
+        motor4.updata = 0;                     //æ›´æ–°ä¸­æ–­äº‹ä»¶è®°å½•
+        cap_val_1 = HAL_TIM_ReadCapturedValue(motor4.htim_ic, motor4.ic_channel);   //è¯»å–TIM3 CCR3çš„å€¼
+        ic_edge = IC_FALL_EDGE;                                                     //ç­‰å¾…ä¸‹é™æ²¿
 
-        /* ¼ì²âÁíÒ»¶ËGPIO¿ÚµÄµçÆ½±ä»¯À´ÅĞ¶Ï·½Ïò*/
+        /* æ£€æµ‹å¦ä¸€ç«¯GPIOå£çš„ç”µå¹³å˜åŒ–æ¥åˆ¤æ–­æ–¹å‘*/
         if(HAL_GPIO_ReadPin(motor4.IC_GPIO_Port_v, motor4.IC_Pin_v) == GPIO_PIN_RESET)
         {
             direct = BACKWARD;
@@ -293,57 +297,58 @@ void TIM3CaptureChannel3Callback()
         {
             direct = FORWARD;
         }
-        __HAL_TIM_SET_CAPTUREPOLARITY(motor4.htim_ic, motor4.ic_channel, TIM_ICPOLARITY_FALLING);     //×ª»»ÊäÈë²¶»ñ¼«ĞÔÎªÏÂ½µÑØ
+        __HAL_TIM_SET_CAPTUREPOLARITY(motor4.htim_ic, motor4.ic_channel, TIM_ICPOLARITY_FALLING);     //è½¬æ¢è¾“å…¥æ•è·ææ€§ä¸ºä¸‹é™æ²¿
     }
     
-    else                                                                                              //¼ì²âµ½ÏÂ½µÑØ
+    else                                                                                              //æ£€æµ‹åˆ°ä¸‹é™æ²¿
     {
-        cap_val_2 = HAL_TIM_ReadCapturedValue(motor4.htim_ic, motor4.ic_channel);                     //ÔÙ´Î¶ÁÈ¡TIM3 CCR1µÄÖµ
-        if(motor4.updata == 0)                                                                        //ÈôÁ½´Î²¶»ñÖ®¼ä¼ÆÊıÆ÷Î´Òç³ö
+        cap_val_2 = HAL_TIM_ReadCapturedValue(motor4.htim_ic, motor4.ic_channel);                     //å†æ¬¡è¯»å–TIM3 CCR1çš„å€¼
+        if(motor4.updata == 0)                                                                        //è‹¥ä¸¤æ¬¡æ•è·ä¹‹é—´è®¡æ•°å™¨æœªæº¢å‡º
         {
             single_speed = SPEED_PARAM / (cap_val_2 - cap_val_1) * direct;
         }
-        else if(motor4.updata == 1)                                                                   //ÈôÁ½´Î²¶»ñÖ®¼äÒç³öÒ»¸ö¼ÆÊıÖÜÆÚ
+        else if(motor4.updata == 1)                                                                   //è‹¥ä¸¤æ¬¡æ•è·ä¹‹é—´æº¢å‡ºä¸€ä¸ªè®¡æ•°å‘¨æœŸ
         {
             single_speed = SPEED_PARAM / ((MAX_TIM_CNT - cap_val_1) + cap_val_2) * direct;
         }
-        else                                                                                          //ÈôÁ½´Î²¶»ñÖ®¼äÒç³öN¸ö¼ÆÊıÖÜÆÚ
+        else                                                                                          //è‹¥ä¸¤æ¬¡æ•è·ä¹‹é—´æº¢å‡ºNä¸ªè®¡æ•°å‘¨æœŸ
         {
             single_speed = SPEED_PARAM / ((MAX_TIM_CNT - cap_val_1) + MAX_TIM_CNT * (motor4.updata - 1) + cap_val_2) * direct;
         }
         
-        sum_speed += single_speed;                              //²ÉÑùÖÜÆÚÀÛ¼Ó
-        cap_cnt++;                                              //ÀÛ»ı²ÉÑù´ÎÊı
+        sum_speed += single_speed;                              //é‡‡æ ·å‘¨æœŸç´¯åŠ 
+        cap_cnt++;                                              //ç´¯ç§¯é‡‡æ ·æ¬¡æ•°
         
-        if(cap_cnt == FILTER) {                                 //²ÉÑùÍê³É                                   
+        if(cap_cnt == FILTER) {                                 //é‡‡æ ·å®Œæˆ                                   
            cap_cnt = 0;                                     
-           last_average_speed = average_speed;                  //±£´æÉÏÒ»´ÎÂË²¨ºóµÄËÙ¶ÈÖµ
+           last_average_speed = average_speed;                  //ä¿å­˜ä¸Šä¸€æ¬¡æ»¤æ³¢åçš„é€Ÿåº¦å€¼
            if(flag_first == 0) {
-               average_speed = (sum_speed+last_average_speed) / FILTER; //µÚÒ»´ÎÂË²¨Ê± last_average_speed=0
+               average_speed = (sum_speed+last_average_speed) / FILTER; //ç¬¬ä¸€æ¬¡æ»¤æ³¢æ—¶ last_average_speed=0
                flag_first = 1;
            }
            else {
-               average_speed = (sum_speed-single_speed+last_average_speed) / FILTER;    //ÍùºóµÄÂË²¨¶¼ÉáÆú×îºóÒ»¸ö²É¼¯µÄËÙ¶È Ìæ»»ÎªÉÏÒ»´ÎÂË²¨ºóµÄËÙ¶È
+               average_speed = (sum_speed-single_speed+last_average_speed) / FILTER;    //å¾€åçš„æ»¤æ³¢éƒ½èˆå¼ƒæœ€åä¸€ä¸ªé‡‡é›†çš„é€Ÿåº¦ æ›¿æ¢ä¸ºä¸Šä¸€æ¬¡æ»¤æ³¢åçš„é€Ÿåº¦
            }
            
-           if(!(__fabs(average_speed + last_average_speed) < 5)) {              //ÈôÉÏÒ»´ÎÓëÕâÒ»´Î²îÖµ¹ı´ó²¢ÇÒÏà¼Óºó½Ó½ü0 ËµÃ÷·½ÏòÖµ·¢ÉúÌø±ä
+           if(!(__fabs(average_speed + last_average_speed) < 5)) {              //è‹¥ä¸Šä¸€æ¬¡ä¸è¿™ä¸€æ¬¡å·®å€¼è¿‡å¤§å¹¶ä¸”ç›¸åŠ åæ¥è¿‘0 è¯´æ˜æ–¹å‘å€¼å‘ç”Ÿè·³å˜
                 motor4.freq =  average_speed ;
            } 
-           cap_cnt = 0;             //²ÉÑù´¦ÀíÍêºó  ½«Í³¼Æ²ÉÑù´ÎÊıµÄÖµÇå0 µÈ´ıÏÂÒ»´Î²ÉÑù´¦Àí
-           sum_speed = 0;           //²ÉÑù´¦ÀíÍêºó  ½«²ÉÑù×ÜºÍµÄÖµÇå0 µÈ´ıÏÂÒ»´Î²ÉÑù´¦Àí
+           cap_cnt = 0;             //é‡‡æ ·å¤„ç†å®Œå  å°†ç»Ÿè®¡é‡‡æ ·æ¬¡æ•°çš„å€¼æ¸…0 ç­‰å¾…ä¸‹ä¸€æ¬¡é‡‡æ ·å¤„ç†
+           sum_speed = 0;           //é‡‡æ ·å¤„ç†å®Œå  å°†é‡‡æ ·æ€»å’Œçš„å€¼æ¸…0 ç­‰å¾…ä¸‹ä¸€æ¬¡é‡‡æ ·å¤„ç†
         }
-        __HAL_TIM_SET_CAPTUREPOLARITY(motor4.htim_ic, motor4.ic_channel, TIM_ICPOLARITY_RISING);      //×ª»»ÊäÈë²¶»ñ¼«ĞÔÎªÉÏÉıÑØ£¬µÈ´ıÏÂÒ»´Î²ÉÑù
-        ic_edge = IC_RISE_EDGE;     //µÈ´ıÏÂÒ»¸öÖÜÆÚµÄµÚÒ»¸öÉÏÉıÑØ
+        __HAL_TIM_SET_CAPTUREPOLARITY(motor4.htim_ic, motor4.ic_channel, TIM_ICPOLARITY_RISING);      //è½¬æ¢è¾“å…¥æ•è·ææ€§ä¸ºä¸Šå‡æ²¿ï¼Œç­‰å¾…ä¸‹ä¸€æ¬¡é‡‡æ ·
+        ic_edge = IC_RISE_EDGE;     //ç­‰å¾…ä¸‹ä¸€ä¸ªå‘¨æœŸçš„ç¬¬ä¸€ä¸ªä¸Šå‡æ²¿
         
     }
 }
 
-/**********************************************************************************************************
-*º¯ Êı Ãû: TIM5_IcOverflowCntCallback
-*¹¦ÄÜËµÃ÷: TIM5¶¨Ê±Æ÷¼ÆÊıÆ÷Òç³ö ¸üĞÂÖĞ¶ÏÊÂ¼ş´ÎÊı
-*ĞÎ    ²Î: ÎŞ
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    TIM5_IcOverflowCntCallback
+ * @declaration : TIM5å®šæ—¶å™¨è®¡æ•°å™¨æº¢å‡º   æ›´æ–°ä¸­æ–­äº‹ä»¶æ¬¡æ•°
+ * @param   None    
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void TIM5_IcOverflowCntCallback(void)
 {
     if(motor1.updata < MAX_TIM_CNT)
@@ -367,12 +372,13 @@ void TIM5_IcOverflowCntCallback(void)
     }
 }
 
-/**********************************************************************************************************
-*º¯ Êı Ãû: TIM3_IcOverflowCntCallback
-*¹¦ÄÜËµÃ÷: TIM3¶¨Ê±Æ÷¼ÆÊıÆ÷Òç³ö ¸üĞÂÖĞ¶ÏÊÂ¼ş´ÎÊı
-*ĞÎ    ²Î: ÎŞ
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    TIM3_IcOverflowCntCallback
+ * @declaration : TIM3å®šæ—¶å™¨è®¡æ•°å™¨æº¢å‡º   æ›´æ–°ä¸­æ–­äº‹ä»¶æ¬¡æ•°
+ * @param   None    
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void TIM3_IcOverflowCntCallback()
 {
     if(motor3.updata < MAX_TIM_CNT)
@@ -397,12 +403,13 @@ void TIM3_IcOverflowCntCallback()
 }
 
 
-/**********************************************************************************************************
-*º¯ Êı Ãû: HAL_TIM_PeriodElapsedCallback
-*¹¦ÄÜËµÃ÷: Òç³öÖĞ¶Ï»Øµ÷º¯Êı
-*ĞÎ    ²Î: ÎŞ
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    HAL_TIM_PeriodElapsedCallback
+ * @declaration : æº¢å‡ºä¸­æ–­å›è°ƒå‡½æ•°    
+ * @param   None    
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 		if(htim->Instance == TIM3)
@@ -416,12 +423,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     }
 }
 
-/**********************************************************************************************************
-*º¯ Êı Ãû: HAL_TIM_IC_CaptureCallback
-*¹¦ÄÜËµÃ÷: ÊäÈë²¶»ñÊÂ¼ş»Øµ÷º¯Êı
-*ĞÎ    ²Î: ÎŞ
-*·µ »Ø Öµ: ÎŞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    HAL_TIM_IC_CaptureCallback
+ * @declaration : è¾“å…¥æ•è·äº‹ä»¶å›è°ƒå‡½æ•°    
+ * @param   None    
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
     static long cnt_encoder=0;
@@ -431,11 +439,11 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     {
         if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
         {
-            TIM5CaptureChannel1Callback();           //µç»ú1ÊäÈë²¶»ñ
+            TIM5CaptureChannel1Callback();           //ç”µæœº1è¾“å…¥æ•è·
         }
         else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
         {  
-            TIM5CaptureChannel3Callback();           //µç»ú2ÊäÈë²¶»ñ
+            TIM5CaptureChannel3Callback();           //ç”µæœº2è¾“å…¥æ•è·
         }
     }
 
@@ -443,11 +451,11 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     {
         if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
         {
-            TIM3CaptureChannel1Callback();           //µç»ú3ÊäÈë²¶»ñ
+            TIM3CaptureChannel1Callback();           //ç”µæœº3è¾“å…¥æ•è·
         }
         else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
         {
-            TIM3CaptureChannel3Callback();           //µç»ú4ÊäÈë²¶»ñ
+            TIM3CaptureChannel3Callback();           //ç”µæœº4è¾“å…¥æ•è·
         }
     }
     
@@ -455,7 +463,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     
     if(count == 400) {
         count = 0;
-        encoder += (__fabs(motor1.freq)+__fabs(motor2.freq)+__fabs(motor3.freq)+__fabs(motor4.freq))/4.0;   //±àÂëÆ÷¼ÆËãÂ·³Ì
+        encoder += (__fabs(motor1.freq)+__fabs(motor2.freq)+__fabs(motor3.freq)+__fabs(motor4.freq))/4.0;   //ç¼–ç å™¨è®¡ç®—è·¯ç¨‹
     }
 }
 

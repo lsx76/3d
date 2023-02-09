@@ -2,7 +2,7 @@
 
 pid_data_t track_pid_data;
 
-/* Ñ­¼£pid¿ØÖÆ²ÎÊı */
+/* å¾ªè¿¹pidæ§åˆ¶å‚æ•° */
 pid_paramer_t track_pid_paramer = {
     .integrate_max = 5,
     .kp = 2.5,
@@ -11,27 +11,23 @@ pid_paramer_t track_pid_paramer = {
     .control_output_limit = 40
 };
 
-/* ¼ÆËãÑ­¼£Æ«²îÖµËùÓÃÈ¨ÖØ*/
-float row_weight[9] = {0,-4,-3,-2,-1,1,2,3,4};   //×óÆ«Êä³ö¸º  ÓÒÆ«Êä³öÕı
-float vertical_weight[9] = {0,-4,-3,-2,-1,1,2,3,4};    //ÉÏÆ«Êä³ö¸º  ÏÂÆ«Êä³öÕı
-												
-/**********************************************************************
-  * º¯ÊıÃû£ºset_track_status
-  * ÃèÊö: ÉèÖÃÊÇ·ñ¿ªÆôÑ­¼£
-  * ²ÎÊı£ºtrack_pid_data½á¹¹Ìå   ×´Ì¬
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+/* è®¡ç®—å¾ªè¿¹åå·®å€¼æ‰€ç”¨æƒé‡*/
+float row_weight[9] = {0,-4,-3,-2,-1,1,2,3,4};   //å·¦åè¾“å‡ºè´Ÿ  å³åè¾“å‡ºæ­£
+float vertical_weight[9] = {0,-4,-3,-2,-1,1,2,3,4};    //ä¸Šåè¾“å‡ºè´Ÿ  ä¸‹åè¾“å‡ºæ­£
+
+
 void set_track_status(TRACKINGBOARD_t *trackboard,bool status)
 {
     trackboard->status = status;
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºtrack_pid_data_init
-  * ÃèÊö: ³õÊ¼»¯Ñ­¼£pidÊı¾İ
-  * ²ÎÊı£ºtrack_pid_data½á¹¹Ìå
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    track_pid_data_init
+ * @declaration : åˆå§‹åŒ–å¾ªè¿¹pidæ•°æ®
+ * @param   track_pid_data å¾ªè¿¹æ¿pidç»“æ„ä½“
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void track_pid_data_init(pid_data_t *track_pid_data)
 {
     track_pid_data->expect = 0;
@@ -52,11 +48,12 @@ void track_pid_data_init(pid_data_t *track_pid_data)
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºcalculate_diviation
-  * ÃèÊö: ¼ÆËãÑ­¼£°åµÄÆ«ÀëÖµ
-  * ²ÎÊı£ºµçÆ½ĞÅÏ¢Êı×é   ÅäÌ×È¨ÖØ
-  * ·µ»ØÖµ:Æ«ÀëÂ·¾¶Öµ
-***********************************************************************/
+ * @Name    calculate_diviation
+ * @declaration :è®¡ç®—å¾ªè¿¹æ¿çš„åç¦»å€¼
+ * @param   trackboard å¾ªè¿¹æ¿ç»“æ„ä½“  weight æƒé‡
+ * @retval   : div åç¦»å€¼
+ * @author  hoson_stars
+ ***********************************************************************/
 int calculate_diviation(TRACKINGBOARD_t *trackboard,float weight[])
 {
     int div = 0;
@@ -67,11 +64,12 @@ int calculate_diviation(TRACKINGBOARD_t *trackboard,float weight[])
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºtrack_pid()
-  * ÃèÊö: Ñ­¼£pid
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    track_pid
+ * @declaration :å¾ªè¿¹pid
+ * @param   trackboard å¾ªè¿¹æ¿ç»“æ„ä½“  weight æƒé‡
+ * @retval   : pid_positional(&track_pid_data, &track_pid_paramer) pidè¾“å‡ºé‡
+ * @author  hoson_stars
+ ***********************************************************************/
 int track_pid(TRACKINGBOARD_t *trackboard,float weight[])
 {
     if(trackboard->status == true) {

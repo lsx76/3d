@@ -190,132 +190,14 @@ int main(void)
 
   /* Infinite loop */
 	/* USER CODE BEGIN WHILE */
-//	cmd_action_group_run(0x00,1);
-//	delay_ms(1500);
-//	span_find_zero();
-//	span(0);
-//	set_chassis_speed(120,0,0); 
-//	delay_ms(1200);
-//	set_chassis_speed(0,0,0);
-//	delay_ms(100);
-//	move_by_encoder(2,-8500);
-//	hit_bar_blue();
-//	move_to_bar_left_blue();
-//	
-//	Catch_Steppedplatform_blue();
-//	hit_bar_blue();
-//	
-//	delay_ms(300);
-//	set_chassis_speed(0,0,0);
-//	delay_ms(300);
-//	set_chassis_speed(-80,0,0);
-//	delay_ms(800);
-//	set_chassis_speed(0,0,0);
-//	delay_ms(300);
-//	set_imu_status(&attitude,true);
-//	delay_ms(500);
-//		
-//		set_chassis_speed(0,-150,0);
-//		delay_ms(3270);
-//		while(1)
-//		{
-//			set_chassis_speed(-50,0,0);
-//			if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2) == 0||HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_3) == 0)break;
-//		}
-//		set_chassis_speed(0,0,0);
-//		delay_ms(100);
-//		set_chassis_speed(0,90,0);
-//		delay_ms(800);
-//		set_chassis_speed(0,0,0);
-//		delay_ms(100);
-//		set_chassis_speed(-150,0,0);
-//		delay_ms(1500);
-//		delay_ms(100);
-//		set_chassis_speed(0,-90,0);
-//		delay_ms(1000);
-//		set_imu_status(&attitude,false);
-//		set_chassis_speed(0,0,80);
-//		delay_ms(1800);
-//		hit_bar_blue();
-//		move_to_bar_left_blue();
-//		set_chassis_speed(0,0,0);
-//		delay_ms(500);
-//		set_chassis_speed(20,50,0);
-//		delay_ms(650);
-//		set_chassis_speed(0,0,0);
-//		final_Catch_disc_blue();
-//		cmd_action_group_run(0x00,1);
-//		delay_ms(1500);
-//		set_chassis_speed(50,0,0);
-//		delay_ms(500);
-//		imu_calibration();
-//		delay_ms(500);
-//		set_chassis_speed(-50,0,0);
-//		delay_ms(1050);
-//		set_imu_status(&attitude,true);
-//		set_chassis_speed(0,0,0);
-//		delay_ms(500);
-//		move_by_encoder(2,-5000);
-//		while(1)
-//		{
-//			set_chassis_speed(0,-80,0);
-//			if((HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 0&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0))break;
-//		}
-//		set_chassis_speed(0,-80,0);
-//		HAL_Delay(1000);
-//		hit_bar_blue();
-//		move_to_bar_left_blue();
-//		distinguish_blue();
-//		distinguish_blue();
-//		distinguish_blue();
-//		distinguish_blue();
-//		distinguish_blue();
-//		stack_transfer_blue();
-////		while(1) 
-////	{
-////       set_chassis_speed(10, 30, 0);
-////       if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0) break;
-////  }
-//		get_qrcode();
-////		get_scores_blue();
-//		get_scores_qrcode_blue();
-//		
-//		set_chassis_speed(-50,0,0);
-//		delay_ms(850);
-//		set_imu_status(&attitude,true);
-//		set_chassis_speed(0,0,0);
-//		delay_ms(500);
-//		while(1)
-//		{
-//			set_chassis_speed(0,-80,0);
-//			if((HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 1))break;
-//		}
-//		set_chassis_speed(0,-80,0);
-//		HAL_Delay(1500);
-//		set_chassis_speed(0,-120,0);
-//		HAL_Delay(1650);
-//		set_chassis_speed(0,0,0);
-//		delay_ms(300);
-//		set_chassis_speed(-80,0,0);
-//		delay_ms(1500);
-//	rode_blue_test();
 	span_init();
 	blue_or_red();
 
-//		distinguish_red();
-//		distinguish_red();
-//		rode_red_test();
-//		set_chassis_speed(0,0,0);
-//		delay_ms(300);
-//		set_imu_status(&attitude,false);
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//			set_motor_speed(1,0);
-//		printf("%f , %f \n",motor1_pid_data.feedback,motor1_pid_data.expect);//调轮子pid
-//		motor_pid();//调轮子pid
 		
   }
   /* USER CODE END 3 */

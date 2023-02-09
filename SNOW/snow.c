@@ -1,15 +1,15 @@
 #include "snow.h"
 
-/* ¶¨ÒåÖÜ×ª¶æ»úµÄ½á¹¹ÌåÊý¾ÝÀàÐÍ */
+/* å®šä¹‰å‘¨è½¬èˆµæœºçš„ç»“æž„ä½“æ•°æ®ç±»åž‹ */
 Steering_t turnover_steering;
 
-
-/**********************************************************************************************************
-*º¯ Êý Ãû: Steering_Init
-*¹¦ÄÜËµÃ÷: ³õÊ¼»¯ÖÜ×ª¶æ»ú
-*ÐÎ    ²Î: ¶æ»ú½á¹¹Ìå    
-*·µ »Ø Öµ: ÎÞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    Steering_Init
+ * @declaration : åˆå§‹åŒ–å‘¨è½¬èˆµæœº
+ * @param   turnover_steering å‘¨è½¬èˆµæœºç»“æž„ä½“
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void Steering_Init(Steering_t *turnover_steering){
 	turnover_steering->htim= &htim8;
 	turnover_steering->channel = TIM_CHANNEL_3;
@@ -17,34 +17,37 @@ void Steering_Init(Steering_t *turnover_steering){
 	HAL_TIM_PWM_Start(turnover_steering->htim,turnover_steering->channel);
 }
 
-/**********************************************************************************************************
-*º¯ Êý Ãû: Set_Steering_clockwise
-*¹¦ÄÜËµÃ÷: Éè¶¨ÖÜ×ª¶æ»úË³Ê±Õë×ª¶¯
-*ÐÎ    ²Î: ¶æ»ú½á¹¹Ìå   
-*·µ »Ø Öµ: ÎÞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    Set_Steering_clockwise
+ * @declaration : è®¾å®šå‘¨è½¬èˆµæœºé¡ºæ—¶é’ˆè½¬åŠ¨
+ * @param   turnover_steering å‘¨è½¬èˆµæœºç»“æž„ä½“
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void Set_Steering_clockwise(Steering_t *turnover_steering){
 	turnover_steering->Pulse=1850;
 	__HAL_TIM_SET_COMPARE(turnover_steering->htim,turnover_steering->channel,turnover_steering->Pulse);
 }
 
-/**********************************************************************************************************
-*º¯ Êý Ãû: Set_Steering_clockwise
-*¹¦ÄÜËµÃ÷: Éè¶¨ÖÜ×ª¶æ»úÄæÊ±Õë×ª¶¯  
-*ÐÎ    ²Î: ¶æ»ú½á¹¹Ìå   
-*·µ »Ø Öµ: ÎÞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    Set_Steering_anticlockwise
+ * @declaration : è®¾å®šå‘¨è½¬èˆµæœºé€†æ—¶é’ˆè½¬åŠ¨
+ * @param   turnover_steering å‘¨è½¬èˆµæœºç»“æž„ä½“
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void Set_Steering_anticlockwise(Steering_t *turnover_steering){
 	turnover_steering->Pulse=1150;
 	__HAL_TIM_SET_COMPARE(turnover_steering->htim,turnover_steering->channel,turnover_steering->Pulse);
 }
 
-/**********************************************************************************************************
-*º¯ Êý Ãû: Set_Steering_clockwise
-*¹¦ÄÜËµÃ÷: Éè¶¨ÖÜ×ª¶æ»úÍ£Ö¹
-*ÐÎ    ²Î: ¶æ»ú½á¹¹Ìå   
-*·µ »Ø Öµ: ÎÞ
-**********************************************************************************************************/
+/**********************************************************************
+ * @Name    Set_Steering_stop
+ * @declaration : è®¾å®šå‘¨è½¬èˆµæœºåœæ­¢
+ * @param   turnover_steering å‘¨è½¬èˆµæœºç»“æž„ä½“
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void Set_Steering_stop(Steering_t *turnover_steering){
 	turnover_steering->Pulse=1500;
 	__HAL_TIM_SET_COMPARE(turnover_steering->htim,turnover_steering->channel,turnover_steering->Pulse);

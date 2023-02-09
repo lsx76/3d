@@ -341,12 +341,3 @@ void UART8_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-//{
-//    if(huart->Instance==USART1)
-//    {
-//        HAL_UART_Transmit(&huart1, &Buffer, 1, 0xff);
-//        HAL_UART_Receive_IT(&huart1,&Buffer,1);
-//    }
-//}
-/* USER CODE END 1 */

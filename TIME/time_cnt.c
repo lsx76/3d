@@ -3,24 +3,24 @@
 
 volatile uint32_t TIME_ISR_CNT;
 
-//ÓÃÓÚ¶¨Ê±Æ÷¿ØÖÆÐÐ×ß¾àÀë
+//ç”¨äºŽå®šæ—¶å™¨æŽ§åˆ¶è¡Œèµ°è·ç¦»
 uint32_t waittime = 0;
 
-//ÏµÍ³Ê±¼ä
+//ç³»ç»Ÿæ—¶é—´
 Time_t Time_Sys;
 
 /**********************************************************************************************************
-*º¯ Êý Ãû: Get_Time_Init
-*¹¦ÄÜËµÃ÷: Ê±¼äÖÜÆÚ¼ÆÊýÄ£¿é³õÊ¼»¯
-*ÐÎ    ²Î: ÎÞ
-*·µ »Ø Öµ: ÎÞ
+*å‡½ æ•° å: Get_Time_Init
+*åŠŸèƒ½è¯´æ˜Ž: æ—¶é—´å‘¨æœŸè®¡æ•°æ¨¡å—åˆå§‹åŒ–
+*å½¢    å‚: æ— 
+*è¿” å›ž å€¼: æ— 
 **********************************************************************************************************/
 //void Get_Time_Init(void)
 //{
-//	//Ê¹ÄÜ¶¨Ê±Æ÷Ê±ÖÓ
+//	//ä½¿èƒ½å®šæ—¶å™¨æ—¶é’Ÿ
 //	__HAL_RCC_TIM6_CLK_ENABLE();
 //
-//	//¶¨Ê±Æ÷³õÊ¼»¯
+//	//å®šæ—¶å™¨åˆå§‹åŒ–
 //	htim6.Instance = TIM6;
 //	htim6.Init.Prescaler = 108 - 1;
 //	htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -28,19 +28,19 @@ Time_t Time_Sys;
 //	htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
 //	HAL_TIM_Base_Init(&htim6);
 //
-//	//Ê¹ÄÜ¶¨Ê±Æ÷ÖÐ¶Ï
+//	//ä½¿èƒ½å®šæ—¶å™¨ä¸­æ–­
 //	HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 5, 0);
 //    HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
 //
-//	//Æô¶¯¶¨Ê±Æ÷
+//	//å¯åŠ¨å®šæ—¶å™¨
 //	HAL_TIM_Base_Start_IT(&htim6);
 //}
 
 /**********************************************************************************************************
-*º¯ Êý Ãû: TIM6_IRQHandler
-*¹¦ÄÜËµÃ÷: ¶¨Ê±Æ÷6ÖÐ¶Ïº¯Êý ¸ºÔð¼ÇÂ¼ÏµÍ³ÔËÐÐÊ±¼ä
-*ÐÎ    ²Î: ÎÞ
-*·µ »Ø Öµ: ÎÞ
+*å‡½ æ•° å: TIM6_IRQHandler
+*åŠŸèƒ½è¯´æ˜Ž: å®šæ—¶å™¨6ä¸­æ–­å‡½æ•° è´Ÿè´£è®°å½•ç³»ç»Ÿè¿è¡Œæ—¶é—´
+*å½¢    å‚: æ— 
+*è¿” å›ž å€¼: æ— 
 **********************************************************************************************************/
 void TIM_IRQ(void)
 {
@@ -49,7 +49,7 @@ void TIM_IRQ(void)
 	  static uint16_t Microsecond_Cnt = 0;
     if (__HAL_TIM_GET_FLAG(&htim6, TIM_FLAG_UPDATE) != RESET)
     {
-        //Ã¿10ms×Ô¼Ó
+        //æ¯10msè‡ªåŠ 
         TIME_ISR_CNT++;
         Microsecond_Cnt += 10;
         
@@ -57,18 +57,18 @@ void TIM_IRQ(void)
         
         if(waittime>0) waittime--;
         
-        //1Ãë
+        //1ç§’
         if (Microsecond_Cnt >= 1000)
         {
             
             Microsecond_Cnt = 0;
             Time_Sys.second++;
-            //1·ÖÖÓ
+            //1åˆ†é’Ÿ
             if (Time_Sys.second >= 60)
             {
                 Time_Sys.second = 0;
                 Time_Sys.minute++;
-                //1Ð¡Ê±
+                //1å°æ—¶
                 if (Time_Sys.minute >= 60)
                 {
                     Time_Sys.minute = 0;
@@ -82,14 +82,14 @@ void TIM_IRQ(void)
 }
 
 /**********************************************************************************************************
-*º¯ Êý Ãû: Get_Period
-*¹¦ÄÜËµÃ÷: »ñÈ¡Ê±¼äÖÜÆÚ
-*ÐÎ    ²Î: Ê±¼äÖÜÆÚ½á¹¹Ìå
-*·µ »Ø Öµ: ÎÞ
+*å‡½ æ•° å: Get_Period
+*åŠŸèƒ½è¯´æ˜Ž: èŽ·å–æ—¶é—´å‘¨æœŸ
+*å½¢    å‚: æ—¶é—´å‘¨æœŸç»“æž„ä½“
+*è¿” å›ž å€¼: æ— 
 **********************************************************************************************************/
 void Get_Time_Period(Testime *Time_Lab)
 {
-    //Èç¹û»¹Î´³õÊ¼»¯
+    //å¦‚æžœè¿˜æœªåˆå§‹åŒ–
     if (Time_Lab->inited == 0)
     {
         Time_Lab->inited = 1;
@@ -97,7 +97,7 @@ void Get_Time_Period(Testime *Time_Lab)
         Time_Lab->Time_Delta = 0;
     }
     Time_Lab->Last_Time = Time_Lab->Now_Time;
-    //µ¥Î»us
+    //å•ä½us
     Time_Lab->Now_Time = 10000 * TIME_ISR_CNT + TIM6->CNT;
     Time_Lab->Time_Delta = Time_Lab->Now_Time - Time_Lab->Last_Time;
 }

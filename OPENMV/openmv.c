@@ -1,28 +1,26 @@
 #include "openmv.h"
 #include "time_delay.h"
 
-#define HeadByte1  0x2C      //´«ÊäÊı¾İÖ¡Ö¡Í·1
-#define HeadByte2  0x12      //´«ÊäÊı¾İÖ¡Ö¡Í·2
-#define CmdByte    0x01      //´«ÊäÊı¾İÖ¡ÃüÁîÖ¡
-#define StatusByte 0x02      //´«ÊäÊı¾İÖ¡×´Ì¬Ö¡
-#define EndByte    0x5B      //´«ÊäÊı¾İÖ¡Ö¡Î²
+#define HeadByte1  0x2C      //ä¼ è¾“æ•°æ®å¸§å¸§å¤´1
+#define HeadByte2  0x12      //ä¼ è¾“æ•°æ®å¸§å¸§å¤´2
+#define CmdByte    0x01      //ä¼ è¾“æ•°æ®å¸§å‘½ä»¤å¸§
+#define StatusByte 0x02      //ä¼ è¾“æ•°æ®å¸§çŠ¶æ€å¸§
+#define EndByte    0x5B      //ä¼ è¾“æ•°æ®å¸§å¸§å°¾
 
-/* ¶¨ÒåopenmvĞÅÏ¢½á¹¹Ìå */
+/* å®šä¹‰openmvä¿¡æ¯ç»“æ„ä½“ */
 OPENMV_t openmv;
 
 
 uint8_t OPENMV_Rx_BUF[OPENMV_Rx_MAX_DATA_SIZE] = {0};
 
 
-
-
-
 /**********************************************************************
-  * º¯ÊıÃû£ºGet_openmv
-  * ÃèÊö: ½âÎö³öopenmv·¢»ØµÄ×´Ì¬
-  * ²ÎÊı£ºopenmvĞÅÏ¢½á¹¹Ìå
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    Get_openmv
+ * @declaration : è§£æå‡ºopenmvå‘å›çš„çŠ¶æ€
+ * @param   openmv openmvä¿¡æ¯ç»“æ„ä½“
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void Get_openmv(OPENMV_t *openmv)
 {
 	
@@ -35,219 +33,238 @@ void Get_openmv(OPENMV_t *openmv)
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºtell_openmv_to_distinguish_Strip
-  * ÃèÊö: ¸æËßopenmv »úĞµ±ÛÒÑ¾­ÉıÆğ ¿ÉÒÔ¿ªÊ¼Ê¶±ğÌõĞÎÆ½Ì¨
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    tell_openmv_to_distinguish_Strip
+ * @declaration : å‘Šè¯‰openmv æœºæ¢°è‡‚å·²ç»å‡èµ· å¯ä»¥å¼€å§‹è¯†åˆ«æ¡å½¢å¹³å°
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void tell_openmv_to_distinguish_Strip()
 {
-    uint8_t command[5];
-    command[0] = 0x2C;
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x01;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,1000);
+  uint8_t command[5];
+  command[0] = 0x2C;
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x01;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,1000);
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºtell_openmv_to_loosen
-  * ÃèÊö: ¸æËßopenmv »úĞµ±ÛÒÑ¾­·ÅÏÂ ¿ÉÒÔËÉ¿ª×¦×Ó
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    tell_openmv_to_loosen
+ * @declaration : å‘Šè¯‰openmv æœºæ¢°è‡‚å·²ç»æ”¾ä¸‹ å¯ä»¥æ¾å¼€çˆªå­(æ”¾åœ¨ç¬¬ä¸€å±‚ï¼Œå¼ å¼€è¾ƒå¤§)
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void tell_openmv_to_loosen()
 {
-    uint8_t command[5];
-    command[0] = 0x2C;
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x02;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,200);
+  uint8_t command[5];
+  command[0] = 0x2C;
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x02;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,200);
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºtell_openmv_to_loosen
-  * ÃèÊö: ¸æËßopenmv »úĞµ±ÛÒÑ¾­·ÅÏÂ ¿ÉÒÔËÉ¿ª×¦×Ó
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    tell_openmv_to_loosen2
+ * @declaration : å‘Šè¯‰openmv æœºæ¢°è‡‚å·²ç»æ”¾ä¸‹ å¯ä»¥æ¾å¼€çˆªå­ï¼ˆæ”¾åœ¨ç¬¬äºŒå±‚ï¼Œå¼ å¼€è¾ƒå°)
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void tell_openmv_to_loosen2()
 {
-    uint8_t command[5];
-    command[0] = 0x2C;
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x09;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,200);
+  uint8_t command[5];
+  command[0] = 0x2C;
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x09;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,200);
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºtell_openmv_to_loosen
-  * ÃèÊö: ¸æËßopenmv »úĞµ±ÛÒÑ¾­·ÅÏÂ ¿ÉÒÔËÉ¿ª×¦×Ó
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    tell_openmv_to_loosen3
+ * @declaration : å‘Šè¯‰openmv æœºæ¢°è‡‚å·²ç»æ”¾ä¸‹ å¯ä»¥æ¾å¼€çˆªå­(icè¯»å–æ—¶å¼ å¼€ä¸€ç‚¹è®©çƒè½¬åˆ°ä¸‹é¢)
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void tell_openmv_to_loosen3()
 {
-    uint8_t command[5];
-    command[0] = 0x2C;
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x0A;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,200);
+  uint8_t command[5];
+  command[0] = 0x2C;
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x0A;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,200);
 }
-
+ 
 /**********************************************************************
-  * º¯ÊıÃû£ºtell_openmv_to_distinguish_Stepped
-  * ÃèÊö: ¸æËßopenmv »úĞµ±ÛÒÑ¾­ÉıÆğ ¿ÉÒÔ¿ªÊ¼Ê¶±ğ½×ÌİÆ½Ì¨
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    tell_openmv_to_distinguish_Stepped
+ * @declaration : å‘Šè¯‰openmv æœºæ¢°è‡‚å·²ç»å‡èµ· å¯ä»¥å¼€å§‹è¯†åˆ«é˜¶æ¢¯å¹³å°
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
   void tell_openmv_to_distinguish_Stepped()
 {
-    uint8_t command[5];
-    command[0] = 0x2C;
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x03;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,1000);
+  uint8_t command[5];
+  command[0] = 0x2C;
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x03;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,1000);
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºtell_claw_to_catch()
-  * ÃèÊö: »úĞµ±ÛÒÑÏÂ½µµ½½×ÌİÆ½Ì¨¶ÔÓ¦¸ß¶È ¸æËß×¦×Ó¿ÉÒÔ×¥È¡
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    tell_claw_to_catch
+ * @declaration : æœºæ¢°è‡‚å·²ä¸‹é™åˆ°é˜¶æ¢¯å¹³å°å¯¹åº”é«˜åº¦ å‘Šè¯‰çˆªå­å¯ä»¥æŠ“å–
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void tell_claw_to_catch()
 {
-    uint8_t command[5];
-    command[0] = 0x2C;
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x04;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,1000);
-	  delay_ms(100);
+  uint8_t command[5];
+  command[0] = 0x2C;
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x04;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,1000);
+	delay_ms(100);
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºdistinguish_red
-  * ÃèÊö: ¸æÖª×¦×Ó Ê¶±ğºìÇò
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    distinguish_red
+ * @declaration : å‘ŠçŸ¥çˆªå­ è¯†åˆ«çº¢çƒ
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void distinguish_red()
 {
-    uint8_t command[5];
-    command[0] = 0x2C;
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x05;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,1000);
+  uint8_t command[5];
+  command[0] = 0x2C;
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x05;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,1000);
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºdistinguish_blue
-  * ÃèÊö: ¸æÖª×¦×Ó Ê¶±ğÀ¶Çò
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    distinguish_blue
+ * @declaration : å‘ŠçŸ¥çˆªå­ è¯†åˆ«è“çƒ
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void distinguish_blue()
 {
-    uint8_t command[5];
-    command[0] = 0x2C;
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x06;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,1000);
+  uint8_t command[5];
+  command[0] = 0x2C;
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x06;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,1000);
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºtell_openmv_to_transfer
-  * ÃèÊö: ¸æÖªopenmv  ¿ªÊ¼µ¹¶âµÄÊ¶±ğ
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    tell_openmv_to_transfer
+ * @declaration : å‘ŠçŸ¥openmv  å¼€å§‹å€’å›çš„è¯†åˆ«
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void tell_openmv_to_transfer()
 {
-    uint8_t command[5];
-    command[0] = 0x2C;
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x07;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,1000);
+  uint8_t command[5];
+  command[0] = 0x2C;
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x07;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,1000);
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºtell_openmv_to_catch_stake()
-  * ÃèÊö: ¸æÖªopenmv  ¿ªÊ¼Á¢×®µÄÊ¶±ğ
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    tell_openmv_to_catch_stake
+ * @declaration : å‘ŠçŸ¥openmv  å¼€å§‹ç«‹æ¡©çš„è¯†åˆ«
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void tell_openmv_to_catch_stake()
 {
-    uint8_t command[5];
-    command[0] = 0x2C;
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x08;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,1000);
+  uint8_t command[5];
+  command[0] = 0x2C;
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x08;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,1000);
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºtell_openmv_to_transfer_blue()
-  * ÃèÊö: ¸æÖªopenmv  ¿ªÊ¼À¶°ë³¡µ¹¶çµÄÊ¶±ğ
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    tell_openmv_to_transfer_blue
+ * @declaration : å‘ŠçŸ¥openmv  å¼€å§‹è“åŠåœºå€’å‰çš„è¯†åˆ«
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void tell_openmv_to_transfer_blue()
 {
-    uint8_t command[5];
-    command[0] = 0x2C;
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x09;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,1000);
+  uint8_t command[5];
+  command[0] = 0x2C;
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x09;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,1000);
 }
 
 /**********************************************************************
-  * º¯ÊıÃû£ºtell_openmv_to_transfer_red()
-  * ÃèÊö: ¸æÖªopenmv  ¿ªÊ¼ºì°ë³¡µ¹¶çµÄÊ¶±ğ
-  * ²ÎÊı£ºÎŞ
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    tell_openmv_to_transfer_red
+ * @declaration : å‘ŠçŸ¥openmv  å¼€å§‹çº¢åŠåœºå€’å‰çš„è¯†åˆ«
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void tell_openmv_to_transfer_red()
 {
-    uint8_t command[5];
-    command[0] = 0x2C;
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x00;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,1000);
+  uint8_t command[5];
+  command[0] = 0x2C;
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x00;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,1000);
 }
 
+/**********************************************************************
+ * @Name    tell_openmv_to_catch_red_disc
+ * @declaration : å‘ŠçŸ¥openmv  å¼€å§‹å¤¹åœ†ç›˜ï¼ˆçº¢è“é€šç”¨ï¼‰
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void tell_openmv_to_catch_red_disc()
 {
-    uint8_t command[5];
-    command[0] = 0x2C; 
-    command[1] = 0x12;
-    command[2] = 0x01;
-    command[3] = 0x0A;
-    command[4] = 0x5B;
-    HAL_UART_Transmit(&huart3,command,5,1000); 
+  uint8_t command[5];
+  command[0] = 0x2C; 
+  command[1] = 0x12;
+  command[2] = 0x01;
+  command[3] = 0x0A;
+  command[4] = 0x5B;
+  HAL_UART_Transmit(&huart3,command,5,1000); 
 }
 
 

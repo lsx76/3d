@@ -27,17 +27,17 @@
 #include "m294.h"
 #include "qrcode.h"
 #include "openmv.h"
-#if EN_USART1_RX   //Èç¹ûÊ¹ÄÜÁË½ÓÊÕ
-//´®¿Ú1ÖÐ¶Ï·þÎñ³ÌÐò
-//×¢Òâ,¶ÁÈ¡USARTx->SRÄÜ±ÜÃâÄªÃûÆäÃîµÄ´íÎó   	
-u8 USART_RX_BUF[USART_REC_LEN];     //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.
-//½ÓÊÕ×´Ì¬
-//bit15£¬	½ÓÊÕÍê³É±êÖ¾
-//bit14£¬	½ÓÊÕµ½0x0d
-//bit13~0£¬	½ÓÊÕµ½µÄÓÐÐ§×Ö½ÚÊýÄ¿
-u16 USART_RX_STA=0;       //½ÓÊÕ×´Ì¬±ê¼Ç	
+#if EN_USART1_RX   //æ¿¡å‚›ç‰æµ£èƒ¯å…˜æµœå—˜å¸´é€ï¿½
+//æ¶“æ’å½›1æ¶“î…ŸæŸ‡éˆå¶…å§Ÿç»‹å¬ªç°­
+//å¨‰ã„¦å‰°,ç’‡è¯²å½‡USARTx->SRé‘³ä»‹ä¼©éå¶ˆå¸¿éšå¶…å¾æ¿¡æ¬‘æ®‘é–¿æ¬’î‡¤   	
+u8 USART_RX_BUF[USART_REC_LEN];     //éŽºãƒ¦æ•¹ç¼‚æ’³å•¿,éˆâ‚¬æ¾¶îœ›SART_REC_LENæ¶“î„ç“§é‘ºï¿½.
+//éŽºãƒ¦æ•¹é˜èˆµâ‚¬ï¿½
+//bit15é”›ï¿½	éŽºãƒ¦æ•¹ç€¹å±¾åžšéå›§ç¹”
+//bit14é”›ï¿½	éŽºãƒ¦æ•¹é’ï¿½0x0d
+//bit13~0é”›ï¿½	éŽºãƒ¦æ•¹é’æ‰®æ®‘éˆå¤‹æ™¥ç€›æ¥„å¦­éæ‰®æ´°
+u16 USART_RX_STA=0;       //éŽºãƒ¦æ•¹é˜èˆµâ‚¬ä½¹çˆ£ç’ï¿½	
 
-u8 aRxBuffer[RXBUFFERSIZE];//HAL¿âÊ¹ÓÃµÄ´®¿Ú½ÓÊÕ»º³å
+u8 aRxBuffer[RXBUFFERSIZE];//HALæ´æ’²å¨‡é¢ã„§æ®‘æ¶“æ’å½›éŽºãƒ¦æ•¹ç¼‚æ’³å•¿
 
 extern ATTITUDE_t  attitude;
 extern uint8_t Buffer;
@@ -607,36 +607,36 @@ int fputc(int ch,FILE *f)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if(huart->Instance==USART1)//Èç¹ûÊÇ´®¿Ú1
+	if(huart->Instance==USART1)//æ¿¡å‚›ç‰é„îˆ™è¦†é™ï¿½1
 	{
-		if((USART_RX_STA&0x8000)==0)//½ÓÊÕÎ´Íê³É
+		if((USART_RX_STA&0x8000)==0)//éŽºãƒ¦æ•¹éˆî„ç•¬éŽ´ï¿½
 		{
-			if(USART_RX_STA&0x4000)//½ÓÊÕµ½ÁË0x0d
+			if(USART_RX_STA&0x4000)//éŽºãƒ¦æ•¹é’é¢ç°¡0x0d
 			{
-				if(aRxBuffer[0]!=0x0a)USART_RX_STA=0;//½ÓÊÕ´íÎó,ÖØÐÂ¿ªÊ¼
-				else USART_RX_STA|=0x8000;	//½ÓÊÕÍê³ÉÁË 
+				if(aRxBuffer[0]!=0x0a)USART_RX_STA=0;//éŽºãƒ¦æ•¹é–¿æ¬’î‡¤,é–²å¶†æŸŠå¯®â‚¬æ¿®ï¿½
+				else USART_RX_STA|=0x8000;	//éŽºãƒ¦æ•¹ç€¹å±¾åžšæµœï¿½ 
 			}
-			else //»¹Ã»ÊÕµ½0X0D
+			else //æ©æ¨»ç—…é€è·ºåŸŒ0X0D
 			{	
 				if(aRxBuffer[0]==0x0d)USART_RX_STA|=0x4000;
 				else
 				{
 					USART_RX_BUF[USART_RX_STA&0X3FFF]=aRxBuffer[0] ;
 					USART_RX_STA++;
-					if(USART_RX_STA>(USART_REC_LEN-1))USART_RX_STA=0;//½ÓÊÕÊý¾Ý´íÎó,ÖØÐÂ¿ªÊ¼½ÓÊÕ	  
+					if(USART_RX_STA>(USART_REC_LEN-1))USART_RX_STA=0;//éŽºãƒ¦æ•¹éç‰ˆåµé–¿æ¬’î‡¤,é–²å¶†æŸŠå¯®â‚¬æ¿®å¬«å¸´é€ï¿½	  
 				}		 
 			}
 		}
 
 	}
 	
-	    /*´®¿Ú5 ÖÐ¶Ï½ÓÊÕÒ»¸öÍÓÂÝÒÇ´«»Ø×Ö½Ú*/
+	    /*æ¶“æ’å½›5 æ¶“î…ŸæŸ‡éŽºãƒ¦æ•¹æ¶“â‚¬æ¶“îˆæª§é“»è½°åŽæµ¼çŠ²æ´–ç€›æ¥„å¦­*/
 	if(huart->Instance == attitude.huart->Instance)
 		{
         receive_imu901_IRQ(&attitude); 
 		}
 		
-		/*´®¿Ú6 ÖÐ¶Ï½ÓÊÕÐ¡ÇòID*/
+		/*æ¶“æ’å½›6 æ¶“î…ŸæŸ‡éŽºãƒ¦æ•¹çå¿•æ‚†ID*/
 		
 	if(huart->Instance == USART6)
 	{
@@ -660,7 +660,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     HAL_UART_Receive_IT(&huart7,&qrcode_Rx_buffer,1);
 	}
 	
-	/*ÒÔÏÂÓÃÓÚ´®¿Ú²âÊÔ*/
+	/*æµ ãƒ¤ç¬…é¢ã„¤ç°¬æ¶“æ’å½›å¨´å¬­ç˜¯*/
 	if(huart->Instance==USART3)
     {
         //HAL_UART_Transmit(&huart1, &Buffer, 1, 0xff);
@@ -671,29 +671,29 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	
 }
 
-//´®¿Ú1ÖÐ¶Ï·þÎñ³ÌÐò
+//æ¶“æ’å½›1æ¶“î…ŸæŸ‡éˆå¶…å§Ÿç»‹å¬ªç°­
 void USART1_myIRQHandler(void)                	
 { 
 	u32 timeout=0;
     u32 maxDelay=0x1FFFF;
-#if SYSTEM_SUPPORT_OS	 	//Ê¹ÓÃOS
+#if SYSTEM_SUPPORT_OS	 	//æµ£è·¨æ•¤OS
 	OSIntEnter();    
 #endif
 	
 	timeout=0;
-    while (HAL_UART_GetState(&huart1)!=HAL_UART_STATE_READY)//µÈ´ý¾ÍÐ÷
+    while (HAL_UART_GetState(&huart1)!=HAL_UART_STATE_READY)//ç»›å¤Šç·Ÿçè¾©åŽ
 	{
-        timeout++;////³¬Ê±´¦Àí
+        timeout++;////ç“’å‘®æ¤‚æ¾¶å‹­æ‚Š
         if(timeout>maxDelay) break;		
 	}
      
 	timeout=0;
-	while(HAL_UART_Receive_IT(&huart1,(u8 *)aRxBuffer, RXBUFFERSIZE)!=HAL_OK)//Ò»´Î´¦ÀíÍê³ÉÖ®ºó£¬ÖØÐÂ¿ªÆôÖÐ¶Ï²¢ÉèÖÃRxXferCountÎª1
+	while(HAL_UART_Receive_IT(&huart1,(u8 *)aRxBuffer, RXBUFFERSIZE)!=HAL_OK)//æ¶“â‚¬å¨†â€³î˜©éžå——ç•¬éŽ´æ„ªç®£éšåº¯ç´é–²å¶†æŸŠå¯®â‚¬éšîˆ™è…‘é‚î…žè‹Ÿç’å‰§ç–†RxXferCountæ¶“ï¿½1
 	{
-        timeout++; //³¬Ê±´¦Àí
+        timeout++; //ç“’å‘®æ¤‚æ¾¶å‹­æ‚Š
         if(timeout>maxDelay) break;	
 	}
-#if SYSTEM_SUPPORT_OS	 	//Ê¹ÓÃOS
+#if SYSTEM_SUPPORT_OS	 	//æµ£è·¨æ•¤OS
 	OSIntExit();  											 
 #endif
 } 

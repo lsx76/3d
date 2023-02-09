@@ -4,21 +4,28 @@
 #include "stdio.h"
 #include "lsc.h"
 
-/*¹âµçÃÅ¼ì²â*/
+/*å…‰ç”µé—¨æ£€æµ‹*/
 #define photogate HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_4)
-//#define photogate_right HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1)
+//#define photogate_right HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1)      //é‡‡ç”¨åŒå…‰ç”µé—¨æ–¹æ¡ˆæ•°çš„æ›´åŠ å‡†ç¡®
 
 extern int waittime;
 
-/*ÊÇ·ñÍê³É×ª¶¯±êÖ¾Î»*/
+/*æ˜¯å¦å®Œæˆè½¬åŠ¨æ ‡å¿—ä½*/
 bool span_flag = true;
 
 /**********************************************************************
-  * º¯ÊıÃû£ºspan
-  * ÃèÊö: Ô²ÅÌ×ª¶¯µ½ÏàÓ¦±êºÅ¿ÓÎ»
-  * ²ÎÊı£º¿Ó  Î»    
-  * ·µ»ØÖµ:ÎŞ
+  * å‡½æ•°åï¼šspan
+  * æè¿°: åœ†ç›˜è½¬åŠ¨åˆ°ç›¸åº”æ ‡å·å‘ä½
+  * å‚æ•°ï¼šå‘  ä½    
+  * è¿”å›å€¼:æ— 
 ***********************************************************************/
+/**********************************************************************
+ * @Name    span
+ * @declaration : åœ†ç›˜è½¬åŠ¨åˆ°ç›¸åº”æ ‡å·å‘ä½
+ * @param   stord_id   å‘ä½å·ç 
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void span(int store_id)
 {
   static int zm_now = 0;
@@ -31,7 +38,7 @@ void span(int store_id)
 		while((photogate== 0));
 		Set_Steering_stop(&turnover_steering);
 		return;
-	}//³õÊ¼»¯span(0)»òĞí¿ÉÒÔ½â¾ö
+	}//åˆå§‹åŒ–span(0)æˆ–è®¸å¯ä»¥è§£å†³
 	//-----------------------------
 	zm_count = store_id - zm_now;	
 //	if(zm_count > 6) zm_count -= 12;
@@ -40,9 +47,9 @@ void span(int store_id)
 	zm_now += zm_count;
 	if(zm_now >= 10)  zm_now -= 10;
 	else if(zm_now < 0)	zm_now += 10;
-	if(zm_dir == 1)	Set_Steering_anticlockwise(&turnover_steering);     //pan = TIM->CCR1 //¿ØÖÆ¶æ»úµÄËÙ¶È  90  210
+	if(zm_dir == 1)	Set_Steering_anticlockwise(&turnover_steering);     //pan = TIM->CCR1 //æ§åˆ¶èˆµæœºçš„é€Ÿåº¦  90  210
 	else 	Set_Steering_clockwise(&turnover_steering);
-	if( (photogate== 1))zm_count += zm_dir;    //photo ÊÇºìÍâ¶ÔÉäÆ÷  &&->||
+	if( (photogate== 1))zm_count += zm_dir;    //photo æ˜¯çº¢å¤–å¯¹å°„å™¨  &&->||
 	//if(photo1 == 1 )zm_count += zm_dir;
 	while(zm_count != 0)
 	{
@@ -55,12 +62,19 @@ void span(int store_id)
 			if(zm_count == 0)	{
 				 Set_Steering_stop(&turnover_steering);
 			   return;
-		  }	//±ê¼Ç
+		  }	//æ ‡è®°
 		delay_ms(400);
 		}
 	}
 }
 
+/**********************************************************************
+ * @Name    span_find_zero
+ * @declaration : è½¬åˆ°0å·å‘ä½
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void span_find_zero(void)
 {
 	waittime = 100;
@@ -84,6 +98,13 @@ void span_find_zero(void)
 	Set_Steering_stop(&turnover_steering);
 }
 
+/**********************************************************************
+ * @Name    span_init
+ * @declaration : è½¬ç›˜åˆå§‹åŒ–
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void span_init(void)
 {
 	cmd_action_group_run(0x00,1);
@@ -92,6 +113,13 @@ void span_init(void)
 	span(0);
 }
 
+/**********************************************************************
+ * @Name    span_find_flag
+ * @declaration : é‡æ–°å‡†ç¡®å®šä½è·ç¦»æœ€è¿‘çš„æ ‡å¿—ä½
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void span_find_flag(void)
 {
 	waittime = 40;

@@ -12,38 +12,46 @@
 #include "turn_task.h"
 #include "stack_transfer.h"
 
+/*æœ¬ä»£ç ç”±äºç¼©è¿›åœ¨vscodeä¸­MDK5ä¸­æœ‰æ‰€ä¸åŒï¼Œæ‰€ä»¥å¯èƒ½çœ‹èµ·æ¥å¾ˆä¸æ•´é½*/
 extern ATTITUDE_t attitude;
 extern uint32_t waittime;
 extern QRCODE_t qrcode;
-#define HEIGHT_1 1      //¸ß¶È1
-#define HEIGHT_2 2      //¸ß¶È2
-#define HEIGHT_3 3      //¸ß¶È3
+#define HEIGHT_1 1      //é«˜åº¦1
+#define HEIGHT_2 2      //é«˜åº¦2
+#define HEIGHT_3 3      //é«˜åº¦3
 
-/*¼ì²â¸ß¶ÈÓÃµÄºìÍâ*/
+/*æ£€æµ‹é«˜åº¦ç”¨çš„çº¢å¤–*/
 #define SENSOR HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5)
 
-/*½×ÌİÆ½Ì¨ÖĞ¡¢µÍ¸ß¶È×´Ì¬ÇĞ»»±êÖ¾Î»*/
+/*é˜¶æ¢¯å¹³å°ä¸­ã€ä½é«˜åº¦çŠ¶æ€åˆ‡æ¢æ ‡å¿—ä½*/
 uint8_t flag = 0;
 
-/*½×ÌİÆ½Ì¨×¥È¡¸ß¶È±êÖ¾Î»*/
+/*é˜¶æ¢¯å¹³å°æŠ“å–é«˜åº¦æ ‡å¿—ä½*/
 uint8_t height = 0; 
 
 uint8_t red_bit = 0, blue_bit = 0;
-/*Ğ¡ÇòIC¿¨´æ´¢Ë³Ğò*/
+/*å°çƒICå¡å­˜å‚¨é¡ºåº*/
 uint8_t IDLocation[12] = {0};
 
-/*Ğ¡Çò·ÅÈë²Ö¿âË³Ğò*/
+/*å°çƒæ”¾å…¥ä»“åº“é¡ºåº*/
 uint8_t putBallOrder[9] = {0x33,0x23,0x13,0x32,0x22,0x12,0x31,0x21,0x11};
 
+/**********************************************************************
+ * @Name    run_to_stairs_red
+ * @declaration : çº¢åŠåœºå‰å¾€é˜¶æ¢¯å¹³å°
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void run_to_stairs_red(void)
 {
-/***********************È«ÏòÂÖ°æ±¾**************************************
+/***********************å…¨å‘è½®ç‰ˆæœ¬**************************************
 	set_chassis_speed(-20,0,0);
 	 HAL_Delay(500);
 	 set_chassis_speed(-50,0,0);
 	 HAL_Delay(1800);
 	 set_chassis_speed(0,100,0);
-	 HAL_Delay(3500);//×ßµ½½×ÌİÆ½Ì¨Ç°Ãæ
+	 HAL_Delay(3500);//èµ°åˆ°é˜¶æ¢¯å¹³å°å‰é¢
 **************************************************************************/
 	set_chassis_speed(120,0,0);
 	delay_ms(1200);
@@ -52,15 +60,22 @@ void run_to_stairs_red(void)
 	move_by_encoder(2,8000);
 }
 
+/**********************************************************************
+ * @Name    run_to_stairs_blue
+ * @declaration : è“åŠåœºå‰å¾€é˜¶æ¢¯å¹³å°
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void run_to_stairs_blue(void)
 {
-/****************************************************************************
+/****************************å…¨å‘è½®ç‰ˆæœ¬***************************************
 	 set_chassis_speed(-20,0,0);
 	 HAL_Delay(500);
 	 set_chassis_speed(-50,0,0);
 	 HAL_Delay(1800);
 	 set_chassis_speed(0,-100,0);
-	 HAL_Delay(3500);//×ßµ½½×ÌİÆ½Ì¨Ç°Ãæ
+	 HAL_Delay(3500);//èµ°åˆ°é˜¶æ¢¯å¹³å°å‰é¢
 *****************************************************************************/
 	set_chassis_speed(120,0,0); 
 	delay_ms(1200);
@@ -69,6 +84,13 @@ void run_to_stairs_blue(void)
 	move_by_encoder(2,-8500);
 }
 
+/**********************************************************************
+ * @Name    hit_bar_blue
+ * @declaration : è“åŠåœºæ’å‡»æŒ¡æ¿
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void hit_bar_blue(void)
 {
 	set_imu_status(&attitude,false);
@@ -86,6 +108,13 @@ void hit_bar_blue(void)
 			}
 }
 
+/**********************************************************************
+ * @Name    hit_bar_red
+ * @declaration : çº¢åŠåœºæ’å‡»æŒ¡æ¿
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void hit_bar_red(void)
 {
 	set_imu_status(&attitude,false);
@@ -103,6 +132,13 @@ void hit_bar_red(void)
 	}
 }
 
+/**********************************************************************
+ * @Name    move_to_bar_left_blue
+ * @declaration : è“åŠåœºå‰å¾€æŒ¡æ¿è¾¹ç¼˜
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void move_to_bar_left_blue(void)
 {
 	while(1) 
@@ -114,6 +150,13 @@ void move_to_bar_left_blue(void)
 	HAL_Delay(200);
 }
 
+/**********************************************************************
+ * @Name    leave_bar_blue
+ * @declaration : åˆ©ç”¨çº¢å¤–è·ç¦»ä¼ æ„Ÿå™¨ç¦»å¼€æŒ¡æ¿
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void leave_bar_blue(void)
 {
 	while(1)
@@ -127,6 +170,13 @@ void leave_bar_blue(void)
 	set_imu_status(&attitude,true);
 }
 
+/**********************************************************************
+ * @Name    move_to_bar_right_red
+ * @declaration : çº¢åŠåœºç§»åŠ¨åˆ°æŒ¡æ¿å³è¾¹
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void move_to_bar_right_red(void)
 {
 	while(1) 
@@ -138,6 +188,13 @@ void move_to_bar_right_red(void)
 	HAL_Delay(200);
 }
 
+/**********************************************************************
+ * @Name    leave_bar_red
+ * @declaration : åˆ©ç”¨çº¢å¤–ä¼ æ„Ÿå™¨ç¦»å¼€æŒ¡æ¿
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void leave_bar_red(void)
 {
 	while(1)
@@ -151,6 +208,13 @@ void leave_bar_red(void)
 	set_imu_status(&attitude,true);
 }
 
+/**********************************************************************
+ * @Name    run_to_cornucopia_red
+ * @declaration : çº¢åŠåœºå‰å¾€åœ†ç›˜æœº
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void run_to_cornucopia_red(void)
 {
 	
@@ -175,7 +239,7 @@ void run_to_cornucopia_red(void)
 	set_chassis_speed(0,0,0);
 	delay_ms(2500);
 
-//Ê¶±ğÁ½¸öÊ®×ÖµÄ·½·¨£¬µÚ¶ş¸öÊ®×ÖÈİÒ×Ê¶±ğ²»×¼
+//è¯†åˆ«ä¸¤ä¸ªåå­—çš„æ–¹æ³•ï¼Œç¬¬äºŒä¸ªåå­—å®¹æ˜“è¯†åˆ«ä¸å‡†
 //	while(1)
 //	{
 //		set_chassis_speed(30,0,0);
@@ -207,6 +271,13 @@ void run_to_cornucopia_red(void)
 //	}
 }
 
+/**********************************************************************
+ * @Name    run_to_cornucopia_blue
+ * @declaration : è“åŠåœºå‰å¾€åœ†ç›˜
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void run_to_cornucopia_blue(void)
 {
 	while(1)
@@ -230,7 +301,7 @@ void run_to_cornucopia_blue(void)
 	set_chassis_speed(0,0,0);
 	delay_ms(2500);
 
-//Ê¶±ğÁ½¸öÊ®×ÖµÄ·½·¨£¬µÚ¶ş¸öÊ®×ÖÈİÒ×Ê¶±ğ²»×¼
+//è¯†åˆ«ä¸¤ä¸ªåå­—çš„æ–¹æ³•ï¼Œç¬¬äºŒä¸ªåå­—å®¹æ˜“è¯†åˆ«ä¸å‡†
 //	while(1)
 //	{
 //		set_chassis_speed(30,0,0);
@@ -262,6 +333,13 @@ void run_to_cornucopia_blue(void)
 //	}
 }
 
+/**********************************************************************
+ * @Name    avoid_object_red
+ * @declaration : çº¢åŠåœºé¿éšœ
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void avoid_object_red(void)
 {
 	set_chassis_speed(-80,0,0);
@@ -296,6 +374,13 @@ void avoid_object_red(void)
 }
 
 
+/**********************************************************************
+ * @Name    avoid_object_blue
+ * @declaration : è“åŠåœºé¿éšœ
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void avoid_object_blue(void)
 {
 	delay_ms(300);
@@ -332,7 +417,13 @@ void avoid_object_blue(void)
 }
 
 
-//ÓÃºìÍâÅÜµÄÊ±ºò±ÜÕÏÍê×ªÁËÍäÒÔºó£¬ÒÆ¶¯µ½Ô²ÅÌÖĞ¼ä
+/**********************************************************************
+ * @Name    move_to_cornucopia_center
+ * @declaration : ç”¨çº¢å¤–è·‘çš„æ—¶å€™é¿éšœå®Œè½¬äº†å¼¯ä»¥åï¼Œç§»åŠ¨åˆ°åœ†ç›˜ä¸­é—´
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void move_to_cornucopia_center(void)
 {
 		hit_bar_red();
@@ -348,10 +439,17 @@ void move_to_cornucopia_center(void)
 		}
 }
 
+/**********************************************************************
+ * @Name    leave_cornucopia_red
+ * @declaration : çº¢åŠåœºç¦»å¼€åœ†ç›˜
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void leave_cornucopia_red(void)
 {
 /***************************************************************************************
-	//ÓÃÑ­¼£°åÀë¿ª£¬ÓĞµã²»×¼
+	//ç”¨å¾ªè¿¹æ¿ç¦»å¼€ï¼Œæœ‰ç‚¹ä¸å‡†
 	while(1)
 	{
 		set_chassis_speed(15,0,0);
@@ -365,10 +463,17 @@ void leave_cornucopia_red(void)
 	HAL_Delay(500);
 }
 
+/**********************************************************************
+ * @Name    leave_cornucopia_blue
+ * @declaration : è“åŠåœºç¦»å¼€åœ†ç›˜
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void leave_cornucopia_blue(void)
 {
 /***************************************************************************************
-	//ÓÃÑ­¼£°åÀë¿ª£¬ÓĞµã²»×¼
+	//ç”¨å¾ªè¿¹æ¿ç¦»å¼€ï¼Œæœ‰ç‚¹ä¸å‡†
 	while(1)
 	{
 		set_chassis_speed(15,0,0);
@@ -382,6 +487,13 @@ void leave_cornucopia_blue(void)
 	HAL_Delay(500);
 }
 
+/**********************************************************************
+ * @Name    run_to_scores_red
+ * @declaration : çº¢åŠåœºå‰å¾€ä»“åº“
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void run_to_scores_red(void)
 {
 /***************************************************************************************************
@@ -429,6 +541,13 @@ void run_to_scores_red(void)
 	move_to_bar_right_red();
 }
 
+/**********************************************************************
+ * @Name    run_to_scores_blue
+ * @declaration : è“åŠåœºå‰å¾€ä»“åº“
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void run_to_scores_blue(void)
 {
 	while(1)
@@ -451,6 +570,13 @@ void run_to_scores_blue(void)
 		HAL_Delay(1000);
 }
 
+/**********************************************************************
+ * @Name    imu_reset
+ * @declaration : çº¢åŠåœºè½¦ä½“è‡ªè½¬90
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void imu_reset(void)
 {
 	set_chassis_speed(-80,0,0);
@@ -460,6 +586,13 @@ void imu_reset(void)
 	HAL_Delay(200);
 }
 
+/**********************************************************************
+ * @Name    imu_reset_blue
+ * @declaration : è“åŠåœºè½¦ä½“è‡ªè½¬90
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void imu_reset_blue(void)
 {
 	set_chassis_speed(80,0,0);
@@ -469,6 +602,13 @@ void imu_reset_blue(void)
 	HAL_Delay(200);
 }
 
+/**********************************************************************
+ * @Name    back_home_by_speed
+ * @declaration : çº¢åŠåœºä¸é ä¼ æ„Ÿå™¨ï¼Œçº¯é€Ÿåº¦+æ—¶é—´å›å®¶
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void back_home_by_speed(void)
 {
 /*************************************************************************************************
@@ -540,6 +680,13 @@ void back_home_by_speed(void)
 	delay_ms(300);
 }
 
+/**********************************************************************
+ * @Name    back_home_by_speed_blue
+ * @declaration : è“åŠåœºä¸é ä¼ æ„Ÿå™¨ï¼Œçº¯é€Ÿåº¦+æ—¶é—´å›å®¶
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void back_home_by_speed_blue(void)
 {
 	set_chassis_speed(0,0,0);
@@ -566,13 +713,20 @@ void back_home_by_speed_blue(void)
 }
 
 
+/**********************************************************************
+ * @Name    get_qrcode
+ * @declaration : è·å–äºŒç»´ç ä¿¡æ¯
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void get_qrcode(void)
 {
 		qrcode.message = 0;
 		int cnt = 0;
 		uint8_t last_qrcode = 0;
 		uint8_t message = 0;
-		set_chassis_speed(5,10,0);//ÏòÇ°ÒÔ12ËÙ¶ÈÒÆ¶¯
+		set_chassis_speed(5,10,0);//å‘å‰ä»¥12é€Ÿåº¦ç§»åŠ¨
 		while(1){
 			message = qrcode.message;
 			if(message == 0x31 || message == 0x32 || message == 0x33) {
@@ -592,7 +746,7 @@ void get_qrcode(void)
 			if(cnt>2){
 				if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0){
 				if (cnt != 3) {
-					//Ã»ÕÒÆë
+					//æ²¡æ‰¾é½
 						putBallOrder[2] = 0x11;
 						putBallOrder[5] = 0x12;
 						putBallOrder[8] = 0x13;
@@ -605,13 +759,20 @@ void get_qrcode(void)
 		}
 }
 
+/**********************************************************************
+ * @Name    run_to_champion_red
+ * @declaration : çº¢åŠåœºæ—§ç‰ˆå›å®¶
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void run_to_champion_red(void)
 { 
 	set_imu_status(&attitude,true);
 
 
 /************************************************************************************************/
-/*Ê¹ÓÃÇ°ÃæµÄºìÍâ£¬Óöµ½µ²°å¾ÍÍ£ÏÂÀ´£¬ºìÍâµÄ¾àÀë²»µ÷ÊÇÒòÎª±ÜÕÏÒªÓÃÕâ¸ö¾àÀë£¬²»ÄÜ¿¿ºóÃæµÄ°åÌ«½ü*/
+/*ä½¿ç”¨å‰é¢çš„çº¢å¤–ï¼Œé‡åˆ°æŒ¡æ¿å°±åœä¸‹æ¥ï¼Œçº¢å¤–çš„è·ç¦»ä¸è°ƒæ˜¯å› ä¸ºé¿éšœè¦ç”¨è¿™ä¸ªè·ç¦»ï¼Œä¸èƒ½é åé¢çš„æ¿å¤ªè¿‘*/
 //	while(1)
 //	{
 //		if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)break;
@@ -642,8 +803,8 @@ void run_to_champion_red(void)
 	set_chassis_speed(-30,0,0);
 	HAL_Delay(850);
 
-/******************************************°´¼ü****************************************************/
-/***************************ÒÔÏÂÊÇÊÇÊ¹ÓÃÇ°ÃæµÄ°´¼ü×²°åµÄÌõ¼ş****************************************/
+/******************************************æŒ‰é”®****************************************************/
+/***************************ä»¥ä¸‹æ˜¯æ˜¯ä½¿ç”¨å‰é¢çš„æŒ‰é”®æ’æ¿çš„æ¡ä»¶****************************************/
 //	while(1) 
 //	{
 //      set_chassis_speed(0, 80, 0);
@@ -679,7 +840,7 @@ void run_to_champion_red(void)
 //	}
 //	set_chassis_speed(-30,0,0);
 //	HAL_Delay(850);
-/*Ê¹ÓÃÇ°ÃæµÄ°´¼üÊ±£¬Ò»Ö±¸ø°åÒ»¸öÁ¦£¬ËùÒÔÒª¼ÓËÙÒ»¶Î¾àÀëÈÃ³µÍêÈ«»Øµ½¼Ò*/
+/*ä½¿ç”¨å‰é¢çš„æŒ‰é”®æ—¶ï¼Œä¸€ç›´ç»™æ¿ä¸€ä¸ªåŠ›ï¼Œæ‰€ä»¥è¦åŠ é€Ÿä¸€æ®µè·ç¦»è®©è½¦å®Œå…¨å›åˆ°å®¶*/
 //	set_chassis_speed(0,0,0);
 //	HAL_Delay(200);
 //	set_chassis_speed(0,30,0);
@@ -687,7 +848,7 @@ void run_to_champion_red(void)
 /*******************************************************************/		
 
 /********************************************************************/
-/*Ê¹ÓÃÇ°ÃæµÄºìÍâÊ±£¬ºÍ°åÒ»Ö±ÓĞÒ»¶Î¾àÀë£¬ËùÒÔÒª¼ÓËÙÒ»¶Î¾àÀëÈÃ³µÍêÈ«»Øµ½¼Ò*/
+/*ä½¿ç”¨å‰é¢çš„çº¢å¤–æ—¶ï¼Œå’Œæ¿ä¸€ç›´æœ‰ä¸€æ®µè·ç¦»ï¼Œæ‰€ä»¥è¦åŠ é€Ÿä¸€æ®µè·ç¦»è®©è½¦å®Œå…¨å›åˆ°å®¶*/
 //	set_chassis_speed(0,0,0);
 //	HAL_Delay(200);
 //	set_chassis_speed(0,30,0);
@@ -695,13 +856,20 @@ void run_to_champion_red(void)
 /*******************************************************************/		 
 }
 
+/**********************************************************************
+ * @Name    run_to_champion_blue
+ * @declaration : è“åŠåœºæ—§ç‰ˆå›å®¶
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void run_to_champion_blue(void)
 { 
 	set_imu_status(&attitude,true);
 
 
 /************************************************************************************************/
-/*Ê¹ÓÃÇ°ÃæµÄºìÍâ£¬Óöµ½µ²°å¾ÍÍ£ÏÂÀ´£¬ºìÍâµÄ¾àÀë²»µ÷ÊÇÒòÎª±ÜÕÏÒªÓÃÕâ¸ö¾àÀë£¬²»ÄÜ¿¿ºóÃæµÄ°åÌ«½ü*/
+/*ä½¿ç”¨å‰é¢çš„çº¢å¤–ï¼Œé‡åˆ°æŒ¡æ¿å°±åœä¸‹æ¥ï¼Œçº¢å¤–çš„è·ç¦»ä¸è°ƒæ˜¯å› ä¸ºé¿éšœè¦ç”¨è¿™ä¸ªè·ç¦»ï¼Œä¸èƒ½é åé¢çš„æ¿å¤ªè¿‘*/
 //	while(1)
 //	{
 //		if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)break;
@@ -732,8 +900,8 @@ void run_to_champion_blue(void)
 	set_chassis_speed(30,0,0);
 	HAL_Delay(850);
 
-/******************************************°´¼ü****************************************************/
-/***************************ÒÔÏÂÊÇÊÇÊ¹ÓÃÇ°ÃæµÄ°´¼ü×²°åµÄÌõ¼ş****************************************/
+/******************************************æŒ‰é”®****************************************************/
+/***************************ä»¥ä¸‹æ˜¯æ˜¯ä½¿ç”¨å‰é¢çš„æŒ‰é”®æ’æ¿çš„æ¡ä»¶****************************************/
 //	while(1) 
 //	{
 //      set_chassis_speed(0, 80, 0);
@@ -769,7 +937,7 @@ void run_to_champion_blue(void)
 //	}
 //	set_chassis_speed(-30,0,0);
 //	HAL_Delay(850);
-/*Ê¹ÓÃÇ°ÃæµÄ°´¼üÊ±£¬Ò»Ö±¸ø°åÒ»¸öÁ¦£¬ËùÒÔÒª¼ÓËÙÒ»¶Î¾àÀëÈÃ³µÍêÈ«»Øµ½¼Ò*/
+/*ä½¿ç”¨å‰é¢çš„æŒ‰é”®æ—¶ï¼Œä¸€ç›´ç»™æ¿ä¸€ä¸ªåŠ›ï¼Œæ‰€ä»¥è¦åŠ é€Ÿä¸€æ®µè·ç¦»è®©è½¦å®Œå…¨å›åˆ°å®¶*/
 //	set_chassis_speed(0,0,0);
 //	HAL_Delay(200);
 //	set_chassis_speed(0,30,0);
@@ -777,7 +945,7 @@ void run_to_champion_blue(void)
 /*******************************************************************/		
 
 /********************************************************************/
-/*Ê¹ÓÃÇ°ÃæµÄºìÍâÊ±£¬ºÍ°åÒ»Ö±ÓĞÒ»¶Î¾àÀë£¬ËùÒÔÒª¼ÓËÙÒ»¶Î¾àÀëÈÃ³µÍêÈ«»Øµ½¼Ò*/
+/*ä½¿ç”¨å‰é¢çš„çº¢å¤–æ—¶ï¼Œå’Œæ¿ä¸€ç›´æœ‰ä¸€æ®µè·ç¦»ï¼Œæ‰€ä»¥è¦åŠ é€Ÿä¸€æ®µè·ç¦»è®©è½¦å®Œå…¨å›åˆ°å®¶*/
 //	set_chassis_speed(0,0,0);
 //	HAL_Delay(200);
 //	set_chassis_speed(0,30,0);
@@ -785,7 +953,13 @@ void run_to_champion_blue(void)
 /*******************************************************************/		 
 }
 
-//´Ó½×ÌİÆ½Ì¨µÄµ²°å³öÀ´£¬²¢ÇÒÀûÓÃºìÍâ²â¾àÍê³É±ÜÕÏºÍ×ªÍä£¬ºóÃæÓ¦¸Ã½Ó×²°å+ÓÃºìÍâ²â¾àµ÷Õûµ½ÖĞĞÄ
+/**********************************************************************
+ * @Name    rode_of_avoid
+ * @declaration : ä»é˜¶æ¢¯å¹³å°çš„æŒ¡æ¿å‡ºæ¥ï¼Œå¹¶ä¸”åˆ©ç”¨çº¢å¤–æµ‹è·å®Œæˆé¿éšœå’Œè½¬å¼¯ï¼Œåé¢åº”è¯¥æ¥æ’æ¿+ç”¨çº¢å¤–æµ‹è·è°ƒæ•´åˆ°ä¸­å¿ƒï¼ˆå‰å¾€åœ†ç›˜ï¼‰
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void rode_of_avoid(void)
 {
 		leave_bar_red();
@@ -831,7 +1005,13 @@ void rode_of_avoid(void)
 		HAL_Delay(1000);
 }
 
-//±¾Â·ÏßÖ»ÓĞ¶ã±Ü£¬°´¼ü×²°å£¬ÔÚ¼ì²âµ½ÕÏ°­ÎïºóÌí¼Ó
+/**********************************************************************
+ * @Name    rode_of_avoid_key_red
+ * @declaration : æœ¬è·¯çº¿åªæœ‰èº²é¿ï¼ŒæŒ‰é”®æ’æ¿ï¼Œåœ¨æ£€æµ‹åˆ°éšœç¢ç‰©åæ·»åŠ ï¼ˆå‰å¾€åœ†ç›˜ï¼‰
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void rode_of_avoid_key_red(void)
 {
 		while(1) 
@@ -886,6 +1066,13 @@ void rode_of_avoid_key_red(void)
 		HAL_Delay(1750);
 }
 
+/**********************************************************************
+ * @Name    Catch_Steppedplatform_red
+ * @declaration : çº¢åŠåœºæŠ“é˜¶æ¢¯å¹³å°å…¨è¿‡ç¨‹
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void Catch_Steppedplatform_red()
 {
 	openmv.message = 0x00;
@@ -897,13 +1084,13 @@ void Catch_Steppedplatform_red()
 				tell_openmv_to_distinguish_Stepped();
 				tell_openmv_to_distinguish_Stepped();
 				tell_openmv_to_distinguish_Stepped();
-				tell_openmv_to_distinguish_Stepped();     //¸æËßopenmv»úĞµ±ÛÒÑ¾­Ì§Æğ
+				tell_openmv_to_distinguish_Stepped();     //å‘Šè¯‰openmvæœºæ¢°è‡‚å·²ç»æŠ¬èµ·
         
         while(1) {
 						if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0&&HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1) goto baohu_stepped;
 					
             set_chassis_speed(15,20,0);
-						if(SENSOR == 0) flag = 1;       //ËµÃ÷»úÆ÷ÈËĞĞ×ßÒÑ¾­¾­¹ıÁË×î¸ß½×Ìİ
+						if(SENSOR == 0) flag = 1;       //è¯´æ˜æœºå™¨äººè¡Œèµ°å·²ç»ç»è¿‡äº†æœ€é«˜é˜¶æ¢¯
             //Get_openmv(&openmv);
             if(openmv.message == 0x01) break;
         }
@@ -1036,8 +1223,8 @@ void Catch_Steppedplatform_red()
 								delay_ms(500);
                 break;
 					}
-//					tell_openmv_to_loosen2();//ËÉ¿ª×¦×Ó
-//					delay_ms(1000);	//³öÏÖÁËÆæ¹ÖµÄbug£¬²»ËÉ¿ª
+//					tell_openmv_to_loosen2();//æ¾å¼€çˆªå­
+//					delay_ms(1000);	//å‡ºç°äº†å¥‡æ€ªçš„bugï¼Œä¸æ¾å¼€
 					if(ballid == 35||ballid == 18||ballid == 50||ballid == 33)
 					{
 						switch(ballid)
@@ -1099,7 +1286,7 @@ void Catch_Steppedplatform_red()
     }
 	
 baohu_stepped:
-		/* ÏòÇ°½ø  Ö±µ½Æ½Ì¨±ßÔµ */
+		/* å‘å‰è¿›  ç›´åˆ°å¹³å°è¾¹ç¼˜ */
     while(1) {
         set_chassis_speed(-3, 50, 0);
         if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0&&HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1){
@@ -1112,6 +1299,13 @@ baohu_stepped:
 			} 
 }
 
+/**********************************************************************
+ * @Name    Catch_Steppedplatform_blue
+ * @declaration : è“åŠåœºæŠ“å–é˜¶æ¢¯å¹³å°å…¨è¿‡ç¨‹
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void Catch_Steppedplatform_blue()
 {
 	openmv.message = 0x00;
@@ -1123,13 +1317,13 @@ void Catch_Steppedplatform_blue()
 				tell_openmv_to_distinguish_Stepped();
 				tell_openmv_to_distinguish_Stepped();
 				tell_openmv_to_distinguish_Stepped();
-				tell_openmv_to_distinguish_Stepped();     //¸æËßopenmv»úĞµ±ÛÒÑ¾­Ì§Æğ
+				tell_openmv_to_distinguish_Stepped();     //å‘Šè¯‰openmvæœºæ¢°è‡‚å·²ç»æŠ¬èµ·
         
         while(1) {
 						if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0&&HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1) goto baohu_stepped;
 					
             set_chassis_speed(15,20,0);
-						if(SENSOR == 0) flag = 1;       //ËµÃ÷»úÆ÷ÈËĞĞ×ßÒÑ¾­¾­¹ıÁË×î¸ß½×Ìİ
+						if(SENSOR == 0) flag = 1;       //è¯´æ˜æœºå™¨äººè¡Œèµ°å·²ç»ç»è¿‡äº†æœ€é«˜é˜¶æ¢¯
             //Get_openmv(&openmv);
             if(openmv.message == 0x01) break;
         }
@@ -1262,8 +1456,8 @@ void Catch_Steppedplatform_blue()
 								delay_ms(300);
                 break;
 					}
-//					tell_openmv_to_loosen2();//ËÉ¿ª×¦×Ó
-//					delay_ms(1000);	//³öÏÖÁËÆæ¹ÖµÄbug£¬²»ËÉ¿ª
+//					tell_openmv_to_loosen2();//æ¾å¼€çˆªå­
+//					delay_ms(1000);	//å‡ºç°äº†å¥‡æ€ªçš„bugï¼Œä¸æ¾å¼€
 					if(ballid == 35||ballid == 18||ballid == 50||ballid == 33)
 					{
 						switch(ballid)
@@ -1325,7 +1519,7 @@ void Catch_Steppedplatform_blue()
     }
 	
 baohu_stepped:
-		/* ÏòÇ°½ø  Ö±µ½Æ½Ì¨±ßÔµ */
+		/* å‘å‰è¿›  ç›´åˆ°å¹³å°è¾¹ç¼˜ */
     while(1) {
         set_chassis_speed(-3, 50, 0);
         if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0&&HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1){
@@ -1341,123 +1535,125 @@ baohu_stepped:
 
 
 /**********************************************************************
-  * º¯ÊıÃû£ºfinal_Catch_disc_red
-  * ÃèÊö: ¾öÈü  ×¥È¡Ô²ÅÌ»ú
-  * ²ÎÊı£ºÎŞ   
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ * @Name    final_Catch_disc_red
+ * @declaration : çº¢åŠåœºæŠ“å–åœ†ç›˜å…¨è¿‡ç¨‹
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
   void final_Catch_disc_red()
 {
-		int delay_wait_red = 2000;
+	int delay_wait_red = 2000;
     for(int i=0;i<5 ;i++){
-				openmv.message = 0;
-        servogroup_catch_Stripplatform();//»úĞµ±ÛÌ§Éı
-				delay_ms(800);
-				delay_ms(delay_wait_red);
-				if(i<4){
-					delay_wait_red -= 300;
-				}
-        tell_openmv_to_distinguish_Strip();//¸æËßopenmvÒÑÌ§Éı
-				tell_openmv_to_distinguish_Strip();
-				tell_openmv_to_distinguish_Strip();
-				tell_openmv_to_distinguish_Strip();
-				tell_openmv_to_distinguish_Strip();
-				int catch_cnt = 0;
+		openmv.message = 0;
+        servogroup_catch_Stripplatform();//æœºæ¢°è‡‚æŠ¬å‡
+		delay_ms(800);
+		delay_ms(delay_wait_red);
+		if(i<4)
+		{
+			delay_wait_red -= 300;
+		}
+        tell_openmv_to_distinguish_Strip();//å‘Šè¯‰openmvå·²æŠ¬å‡
+		tell_openmv_to_distinguish_Strip();
+		tell_openmv_to_distinguish_Strip();
+		tell_openmv_to_distinguish_Strip();
+		tell_openmv_to_distinguish_Strip();
+		int catch_cnt = 0;
         while(1) {
             //set_chassis_speed(0,5,0);
             //Get_openmv(&openmv);
             if(openmv.message == 0x01) break;
-						if(openmv.message == 0x02 && catch_cnt == 0) {
-							catch_cnt++;
-							tell_openmv_to_distinguish_Strip();
-							tell_openmv_to_distinguish_Strip();
-						}
+			if(openmv.message == 0x02 && catch_cnt == 0) {
+				catch_cnt++;
+				tell_openmv_to_distinguish_Strip();
+				tell_openmv_to_distinguish_Strip();
+			}
         }
-				printf("see it\n");
-				delay_ms(50);
-				cmd_action_group_run(0x16,1);
-				delay_ms(200);
+		printf("see it\n");
+		delay_ms(50);
+		cmd_action_group_run(0x16,1);
+		delay_ms(200);
+		tell_claw_to_catch();
+		delay_ms(100);
+
+		openmv.message = 0;
+        servogroup_ic_Stripplatform();//è¿™é‡Œåº”è¯¥åŠ ä¸€ä¸ªæ‰§è¡Œä»åœ†ç›˜æœºåˆ°è¯»å–icæ•°æ®
+		delay_ms(1000);
+		tell_openmv_to_loosen3();
+		delay_ms(500);
+		int ballid = 0,ball_cnt = 0;
+		waittime = 100;
+		while(1)
+		{
+			if(ReadBlockData(ballID) == STATUS_OK)break;
+			if (waittime == 0 && ball_cnt<2)
+			{
 				tell_claw_to_catch();
 				delay_ms(100);
-
-				openmv.message = 0;
-        servogroup_ic_Stripplatform();//ÕâÀïÓ¦¸Ã¼ÓÒ»¸öÖ´ĞĞ´ÓÔ²ÅÌ»úµ½¶ÁÈ¡icÊı¾İ
-				delay_ms(1000);
-				tell_openmv_to_loosen3();
+				cmd_action_group_run(0x31,1);
 				delay_ms(500);
-				int ballid = 0,ball_cnt = 0;
+				tell_openmv_to_loosen3();
+				delay_ms(100);
 				waittime = 100;
-				while(1)
-				{
-					if(ReadBlockData(ballID) == STATUS_OK)break;
-					if (waittime == 0 && ball_cnt<2)
-					{
-						tell_claw_to_catch();
-						delay_ms(100);
-						cmd_action_group_run(0x31,1);
-						delay_ms(500);
-						tell_openmv_to_loosen3();
-						delay_ms(100);
-						waittime = 100;
-						ball_cnt++;
-					}
-					if(ball_cnt >= 2)break;
-				}
-				ball_cnt = 0;
-				if(waittime == 0) continue;
-				ballid=(int)ballID[1]; 
-				printf("%d",ballid);
-				tell_claw_to_catch();
-				delay_ms(200);
+				ball_cnt++;
+			}
+			if(ball_cnt >= 2)break;
+		}
+		ball_cnt = 0;
+		if(waittime == 0) continue;
+		ballid=(int)ballID[1]; 
+		printf("%d",ballid);
+		tell_claw_to_catch();
+		delay_ms(200);
 
        switch(ballid)
-				{
-            case 49:
-								cmd_action_group_speed(0x08,175);
+		{
+        	case 49:
+				cmd_action_group_speed(0x08,175);
                 cmd_action_group_run(0x08,1);
                 delay_ms(1200);
                 break;
             case 33:
-								cmd_action_group_speed(0x09,175);
+				cmd_action_group_speed(0x09,175);
                 cmd_action_group_run(0x09,1);
                 delay_ms(1200);
                 break;
-						case 17:
-								cmd_action_group_speed(0x0A,175);
+			case 17:
+				cmd_action_group_speed(0x0A,175);
                 cmd_action_group_run(0x0A,1);
                 delay_ms(1200);
                 break;
-						case 50:
-								cmd_action_group_speed(0x0B,175);
+			case 50:
+				cmd_action_group_speed(0x0B,175);
                 cmd_action_group_run(0x0B,1);
                 delay_ms(1200);
                 break;
-						case 34:
-								cmd_action_group_speed(0x0C,175);
+			case 34:
+				cmd_action_group_speed(0x0C,175);
                 cmd_action_group_run(0x0C,1);
                 delay_ms(1200);
                 break;
-						case 18:
-								cmd_action_group_speed(0x0D,175);
+			case 18:
+				cmd_action_group_speed(0x0D,175);
                 cmd_action_group_run(0x0D,1);
                 delay_ms(1200);
                 break;
-						case 51:
-								cmd_action_group_speed(0x0E,175);
+			case 51:
+				cmd_action_group_speed(0x0E,175);
                 cmd_action_group_run(0x0E,1);
                 delay_ms(1200);
                 break;
-						case 35:
-								cmd_action_group_speed(0x0F,175);
+			case 35:
+				cmd_action_group_speed(0x0F,175);
                 cmd_action_group_run(0x0F,1);
                 delay_ms(1200);
                 break;
-						case 19:
-								cmd_action_group_speed(0x10,100);
+			case 19:
+				cmd_action_group_speed(0x10,100);
                 cmd_action_group_run(0x10,1);
                 delay_ms(1800);
                 break;
-					}
+		}
 //				if(ballid == 35||ballid == 18||ballid == 50||ballid == 33)
 //				{
 //					tell_openmv_to_loosen2();
@@ -1466,188 +1662,191 @@ baohu_stepped:
 //				{
 //					tell_openmv_to_loosen2();
 //				}	
-					tell_openmv_to_loosen2();//ËÉ¿ª×¦×Ó
-					delay_ms(500);
-					if(ballid == 35||ballid == 18||ballid == 50||ballid == 33)
-					{
-						switch(ballid)
-						{
-						case 35:
-							cmd_action_group_speed(0x11,175);
-							cmd_action_group_run(0x11,1);
-              delay_ms(800);
-              break;
-						case 18:
-							cmd_action_group_speed(0x12,175);
-							cmd_action_group_run(0x12,1);
-              delay_ms(800);
-              break;
-						case 50:
-							cmd_action_group_speed(0x13,175);
-							cmd_action_group_run(0x13,1);
-              delay_ms(800);
-              break;
-						case 33:
-							cmd_action_group_speed(0x14,175);
-							cmd_action_group_run(0x14,1);
-              delay_ms(800);
-              break;
-						}
-					}
-					if(ballid == 49||ballid == 17||ballid == 34||ballid == 51||ballid == 19)
-				{
-					switch(ballid)
-						{
-						case 49:
-							cmd_action_group_speed(0x18,175);
-							cmd_action_group_run(0x18,1);
-              delay_ms(800);
-              break;
-						case 17:
-							cmd_action_group_speed(0x19,175);
-							cmd_action_group_run(0x19,1);
-              delay_ms(800);
-              break;
-						case 34:
-							cmd_action_group_speed(0x1A,175);
-							cmd_action_group_run(0x1A,1);
-              delay_ms(800);
-              break;
-						case 51:
-							cmd_action_group_speed(0x1B,175);
-							cmd_action_group_run(0x1B,1);
-              delay_ms(800);
-              break;
-						case 19:
-							cmd_action_group_speed(0x1C,175);
-							cmd_action_group_run(0x1C,1);
-              delay_ms(800);
-              break;
-						}
-				}	 	
+		tell_openmv_to_loosen2();//æ¾å¼€çˆªå­
+		delay_ms(500);
+		if(ballid == 35||ballid == 18||ballid == 50||ballid == 33)
+		{
+			switch(ballid)
+			{
+				case 35:
+					cmd_action_group_speed(0x11,175);
+					cmd_action_group_run(0x11,1);
+              		delay_ms(800);
+              		break;
+				case 18:
+					cmd_action_group_speed(0x12,175);
+					cmd_action_group_run(0x12,1);
+              		delay_ms(800);
+             		 break;
+				case 50:
+					cmd_action_group_speed(0x13,175);
+					cmd_action_group_run(0x13,1);
+              		delay_ms(800);
+              		break;
+				case 33:
+					cmd_action_group_speed(0x14,175);
+					cmd_action_group_run(0x14,1);
+              		delay_ms(800);
+            		break;
+			}
+		}
+		if(ballid == 49||ballid == 17||ballid == 34||ballid == 51||ballid == 19)
+		{
+			switch(ballid)
+			{
+				case 49:
+					cmd_action_group_speed(0x18,175);
+					cmd_action_group_run(0x18,1);
+              		delay_ms(800);
+              		break;
+				case 17:
+					cmd_action_group_speed(0x19,175);
+					cmd_action_group_run(0x19,1);
+              		delay_ms(800);
+              		break;
+				case 34:
+					cmd_action_group_speed(0x1A,175);
+					cmd_action_group_run(0x1A,1);
+              		delay_ms(800);
+              		break;
+				case 51:
+					cmd_action_group_speed(0x1B,175);
+					cmd_action_group_run(0x1B,1);
+              		delay_ms(800);
+              		break;
+				case 19:
+					cmd_action_group_speed(0x1C,175);
+					cmd_action_group_run(0x1C,1);
+              		delay_ms(800);
+              		break;
+			}
+		}	 	
 				//ballid=0;
 					
     }
 }
 
-/**********************************************************************
-  * º¯ÊıÃû£ºfinal_Catch_disc_red
-  * ÃèÊö: ¾öÈü  ×¥È¡Ô²ÅÌ»ú
-  * ²ÎÊı£ºÎŞ   
-  * ·µ»ØÖµ:ÎŞ
-***********************************************************************/
+ /**********************************************************************
+ * @Name    final_Catch_disc_blue
+ * @declaration : è“åŠåœºæŠ“å–åœ†ç›˜å…¨è¿‡ç¨‹
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
   void final_Catch_disc_blue()
 {
-		int delay_wait_red = 2000;
+	int delay_wait_red = 2000;
     for(int i=0;i<5 ;i++){
-				openmv.message = 0;
-        servogroup_catch_Stripplatform();//»úĞµ±ÛÌ§Éı
-				delay_ms(800);
-				delay_ms(delay_wait_red);
-				if(i<4){
-					delay_wait_red -= 300;
-				}
-        tell_openmv_to_distinguish_Strip();//¸æËßopenmvÒÑÌ§Éı
-				tell_openmv_to_distinguish_Strip();
-				tell_openmv_to_distinguish_Strip();
-				tell_openmv_to_distinguish_Strip();
-				tell_openmv_to_distinguish_Strip();
-				int catch_cnt = 0;
-        while(1) {
+	openmv.message = 0;
+    servogroup_catch_Stripplatform();//æœºæ¢°è‡‚æŠ¬å‡
+	delay_ms(800);
+	delay_ms(delay_wait_red);
+	if(i<4)
+	{
+		delay_wait_red -= 300;
+	}
+    tell_openmv_to_distinguish_Strip();//å‘Šè¯‰openmvå·²æŠ¬å‡
+	tell_openmv_to_distinguish_Strip();
+	tell_openmv_to_distinguish_Strip();
+	tell_openmv_to_distinguish_Strip();
+	tell_openmv_to_distinguish_Strip();
+	int catch_cnt = 0;
+    while(1)
+	 {
             //set_chassis_speed(0,5,0);
             //Get_openmv(&openmv);
-            if(openmv.message == 0x01) break;
-						if(openmv.message == 0x02 && catch_cnt == 0) {
-							catch_cnt++;
-							tell_openmv_to_distinguish_Strip();
-							tell_openmv_to_distinguish_Strip();
-						}
-        }
-				printf("see it\n");
-				delay_ms(80);
-				cmd_action_group_run(0x37,1);
-				delay_ms(200);
-				tell_claw_to_catch();
-				delay_ms(100);
+    	if(openmv.message == 0x01) break;
+		if(openmv.message == 0x02 && catch_cnt == 0) {
+			catch_cnt++;
+			tell_openmv_to_distinguish_Strip();
+			tell_openmv_to_distinguish_Strip();
+		}
+    }
+	printf("see it\n");
+	delay_ms(80);
+	cmd_action_group_run(0x37,1);
+	delay_ms(200);
+	tell_claw_to_catch();
+	delay_ms(100);
 
-				openmv.message = 0;
-        servogroup_ic_Stripplatform();//ÕâÀïÓ¦¸Ã¼ÓÒ»¸öÖ´ĞĞ´ÓÔ²ÅÌ»úµ½¶ÁÈ¡icÊı¾İ
-				delay_ms(1000);
-				tell_openmv_to_loosen3();
-				delay_ms(300);
-				int ballid = 0,ball_cnt = 0;
-				waittime = 100;
-				while(1)
-				{
-					if(ReadBlockData(ballID) == STATUS_OK)break;
-					if (waittime == 0 && ball_cnt<2)
-					{
-						tell_claw_to_catch();
-						delay_ms(100);
-						cmd_action_group_run(0x31,1);
-						delay_ms(500);
-						tell_openmv_to_loosen3();
-						delay_ms(100);
-						waittime = 100;
-						ball_cnt++;
-					}
-					if(ball_cnt >= 2)break;
-				}
-				ball_cnt = 0;
-				if(waittime == 0) continue;
-				ballid=(int)ballID[1]; 
-				printf("%d",ballid);
-				tell_claw_to_catch();
-				delay_ms(500);
+	openmv.message = 0;
+    servogroup_ic_Stripplatform();//è¿™é‡Œåº”è¯¥åŠ ä¸€ä¸ªæ‰§è¡Œä»åœ†ç›˜æœºåˆ°è¯»å–icæ•°æ®
+	delay_ms(1000);
+	tell_openmv_to_loosen3();
+	delay_ms(300);
+	int ballid = 0,ball_cnt = 0;
+	waittime = 100;
+	while(1)
+	{
+		if(ReadBlockData(ballID) == STATUS_OK)break;
+		if (waittime == 0 && ball_cnt<2)
+		{
+			tell_claw_to_catch();
+			delay_ms(100);
+			cmd_action_group_run(0x31,1);
+			delay_ms(500);
+			tell_openmv_to_loosen3();
+			delay_ms(100);
+			waittime = 100;
+			ball_cnt++;
+		}
+		if(ball_cnt >= 2)break;
+	}
+	ball_cnt = 0;
+	if(waittime == 0) continue;
+	ballid=(int)ballID[1]; 
+	printf("%d",ballid);
+	tell_claw_to_catch();
+	delay_ms(500);
 
-       switch(ballid)
-				{
-            case 49:
-								cmd_action_group_speed(0x08,175);
-                cmd_action_group_run(0x08,1);
-                delay_ms(1200);
-                break;
-            case 33:
-								cmd_action_group_speed(0x09,175);
-                cmd_action_group_run(0x09,1);
-                delay_ms(1200);
-                break;
-						case 17:
-								cmd_action_group_speed(0x0A,175);
-                cmd_action_group_run(0x0A,1);
-                delay_ms(1200);
-                break;
-						case 50:
-								cmd_action_group_speed(0x0B,175);
-                cmd_action_group_run(0x0B,1);
-                delay_ms(1200);
-                break;
-						case 34:
-								cmd_action_group_speed(0x0C,175);
-                cmd_action_group_run(0x0C,1);
-                delay_ms(1200);
-                break;
-						case 18:
-								cmd_action_group_speed(0x0D,175);
-                cmd_action_group_run(0x0D,1);
-                delay_ms(1200);
-                break;
-						case 51:
-								cmd_action_group_speed(0x38,175);
-                cmd_action_group_run(0x38,1);
-                delay_ms(1200);
-                break;
-						case 35:
-								cmd_action_group_speed(0x0F,175);
-                cmd_action_group_run(0x0F,1);
-                delay_ms(1200);
-                break;
-						case 19:
-								cmd_action_group_speed(0x10,100);
-                cmd_action_group_run(0x10,1);
-                delay_ms(1800);
-                break;
-					}
+    switch(ballid)
+	{
+        case 49:
+			cmd_action_group_speed(0x08,175);
+            cmd_action_group_run(0x08,1);
+            delay_ms(1200);
+            break;
+         case 33:
+			cmd_action_group_speed(0x09,175);
+        	cmd_action_group_run(0x09,1);
+        	delay_ms(1200);
+            break;
+		case 17:
+			cmd_action_group_speed(0x0A,175);
+        	cmd_action_group_run(0x0A,1);
+            delay_ms(1200);
+            break;
+		case 50:
+			cmd_action_group_speed(0x0B,175);
+            cmd_action_group_run(0x0B,1);
+            delay_ms(1200);
+            break;
+		case 34:
+			cmd_action_group_speed(0x0C,175);
+            cmd_action_group_run(0x0C,1);
+            delay_ms(1200);
+            break;
+		case 18:
+			cmd_action_group_speed(0x0D,175);
+            cmd_action_group_run(0x0D,1);
+            delay_ms(1200);
+            break;
+		case 51:
+			cmd_action_group_speed(0x38,175);
+            cmd_action_group_run(0x38,1);
+            delay_ms(1200);
+            break;
+		case 35:
+			cmd_action_group_speed(0x0F,175);
+            cmd_action_group_run(0x0F,1);
+            delay_ms(1200);
+            break;
+		case 19:
+			cmd_action_group_speed(0x10,100);
+            cmd_action_group_run(0x10,1);
+            delay_ms(1800);
+            break;
+	}
 //				if(ballid == 35||ballid == 18||ballid == 50||ballid == 33)
 //				{
 //					tell_openmv_to_loosen2();
@@ -1656,70 +1855,77 @@ baohu_stepped:
 //				{
 //					tell_openmv_to_loosen2();
 //				}	
-					tell_openmv_to_loosen2();//ËÉ¿ª×¦×Ó
-					delay_ms(300);
-					if(ballid == 35||ballid == 18||ballid == 50||ballid == 33)
-					{
-						switch(ballid)
-						{
-						case 35:
-							cmd_action_group_speed(0x11,175);
-							cmd_action_group_run(0x11,1);
-              delay_ms(800);
-              break;
-						case 18:
-							cmd_action_group_speed(0x12,175);
-							cmd_action_group_run(0x12,1);
-              delay_ms(800);
-              break;
-						case 50:
-							cmd_action_group_speed(0x13,175);
-							cmd_action_group_run(0x13,1);
-              delay_ms(800);
-              break;
-						case 33:
-							cmd_action_group_speed(0x14,175);
-							cmd_action_group_run(0x14,1);
-              delay_ms(800);
-              break;
-						}
-					}
-					if(ballid == 49||ballid == 17||ballid == 34||ballid == 51||ballid == 19)
-				{
-					switch(ballid)
-						{
-						case 49:
-							cmd_action_group_speed(0x18,175);
-							cmd_action_group_run(0x18,1);
-              delay_ms(800);
-              break;
-						case 17:
-							cmd_action_group_speed(0x19,175);
-							cmd_action_group_run(0x19,1);
-              delay_ms(800);
-              break;
-						case 34:
-							cmd_action_group_speed(0x1A,175);
-							cmd_action_group_run(0x1A,1);
-              delay_ms(800);
-              break;
-						case 51:
-							cmd_action_group_speed(0x1B,175);
-							cmd_action_group_run(0x1B,1);
-              delay_ms(800);
-              break;
-						case 19:
-							cmd_action_group_speed(0x1C,175);
-							cmd_action_group_run(0x1C,1);
-              delay_ms(800);
-              break;
-						}
-				}	 	
-				ballid=0;
+	tell_openmv_to_loosen2();//æ¾å¼€çˆªå­
+	delay_ms(300);
+	if(ballid == 35||ballid == 18||ballid == 50||ballid == 33)
+	{
+		switch(ballid)
+		{
+			case 35:
+				cmd_action_group_speed(0x11,175);
+				cmd_action_group_run(0x11,1);
+              	delay_ms(800);
+              	break;
+			case 18:
+				cmd_action_group_speed(0x12,175);
+				cmd_action_group_run(0x12,1);
+              	delay_ms(800);
+              	break;
+			case 50:
+				cmd_action_group_speed(0x13,175);
+				cmd_action_group_run(0x13,1);
+              	delay_ms(800);
+              	break;
+			case 33:
+				cmd_action_group_speed(0x14,175);
+				cmd_action_group_run(0x14,1);
+              	delay_ms(800);
+              	break;
+		}
+	}
+	if(ballid == 49||ballid == 17||ballid == 34||ballid == 51||ballid == 19)
+	{
+		switch(ballid)
+			{
+				case 49:
+					cmd_action_group_speed(0x18,175);
+					cmd_action_group_run(0x18,1);
+              		delay_ms(800);
+              		break;
+				case 17:
+					cmd_action_group_speed(0x19,175);
+					cmd_action_group_run(0x19,1);
+              		delay_ms(800);
+            		break;
+				case 34:
+					cmd_action_group_speed(0x1A,175);
+					cmd_action_group_run(0x1A,1);
+             		delay_ms(800);
+              		break;
+				case 51:
+					cmd_action_group_speed(0x1B,175);
+					cmd_action_group_run(0x1B,1);
+              		delay_ms(800);
+              		break;
+				case 19:
+					cmd_action_group_speed(0x1C,175);
+					cmd_action_group_run(0x1C,1);
+              		delay_ms(800);
+              		break;
+			}
+		}	 	
+		ballid=0;
 					
     }
 }
 
+/**********************************************************************
+ * @Name    get_scores_red
+ * @declaration : çº¢åŠåœºå°çƒæ”¾å…¥ä»“åº“å…¨è¿‡ç¨‹
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void get_scores_red(void)
 {		
 	hit_bar_red();
@@ -1727,7 +1933,7 @@ void get_scores_red(void)
 	{
        set_chassis_speed(20, 30, 0);
        if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0) break;
-  }
+  	}
 	set_chassis_speed(0,0,0);
 	delay_ms(300);
 	cmd_action_group_run(0x1D,1);
@@ -1873,6 +2079,13 @@ void get_scores_red(void)
 	delay_ms(2000);
 }
 
+/**********************************************************************
+ * @Name    get_scores_blue
+ * @declaration : è“åŠåœºå°çƒæ”¾å…¥ä»“åº“å…¨è¿‡ç¨‹
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void get_scores_blue(void)
 {		
 	hit_bar_red();
@@ -1880,7 +2093,7 @@ void get_scores_blue(void)
 	{
        set_chassis_speed(20, 30, 0);
        if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0) break;
-  }
+  	}
 	set_chassis_speed(0,0,0);
 	delay_ms(300);
 	cmd_action_group_run(0x32,1);
@@ -2026,6 +2239,13 @@ void get_scores_blue(void)
 	delay_ms(2000);
 }
 
+/**********************************************************************
+ * @Name    get_scores_qrcode_red
+ * @declaration : çº¢åŠåœºå°çƒæ”¾å…¥ä»“åº“å…¨è¿‡ç¨‹ï¼ˆåŒ…å«äºŒç»´ç ï¼‰
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void get_scores_qrcode_red(void)
 {
 	hit_bar_red();
@@ -2033,7 +2253,7 @@ void get_scores_qrcode_red(void)
 	{
     set_chassis_speed(15, 30, 0);
     if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0) break;
-  }
+  	}
 	set_chassis_speed(0,0,0);
 	cmd_action_group_run(0x1D,1);
 	span_find_zero();
@@ -2086,7 +2306,7 @@ void get_scores_qrcode_red(void)
 			delay_ms(500);
 			cmd_action_group_speed(0x21,300);
 			cmd_action_group_run(0x21,1);
-				delay_ms(800);
+			delay_ms(800);
 			tell_openmv_to_loosen2();
 			delay_ms(200);
 			cmd_action_group_speed(0x25,175);
@@ -2096,22 +2316,22 @@ void get_scores_qrcode_red(void)
 			}
 		if(putBallOrder[2] == 0x12)
 		{
-				span(5);
-				delay_ms(500);
-				cmd_action_group_speed(0x1E,300);
-				cmd_action_group_run(0x1E,1);
-				delay_ms(600);
-				tell_claw_to_catch();
-				delay_ms(200);
-				cmd_action_group_speed(0x21,300);
-				cmd_action_group_run(0x21,1);
-				delay_ms(800);
-				tell_openmv_to_loosen2();
-				delay_ms(200);
-				cmd_action_group_speed(0x25,175);
-				cmd_action_group_run(0x25,1);
-				delay_ms(800);
-				break;
+			span(5);
+			delay_ms(500);
+			cmd_action_group_speed(0x1E,300);
+			cmd_action_group_run(0x1E,1);
+			delay_ms(600);
+			tell_claw_to_catch();
+			delay_ms(200);
+			cmd_action_group_speed(0x21,300);
+			cmd_action_group_run(0x21,1);
+			delay_ms(800);
+			tell_openmv_to_loosen2();
+			delay_ms(200);
+			cmd_action_group_speed(0x25,175);
+			cmd_action_group_run(0x25,1);
+			delay_ms(800);
+			break;
 		}
 		if(putBallOrder[2] == 0x11)
 		{
@@ -2200,24 +2420,24 @@ void get_scores_qrcode_red(void)
 			delay_ms(800);
 			break;
 			}
-				if(putBallOrder[5] == 0x12)
+		if(putBallOrder[5] == 0x12)
 		{
-				span(5);
-				delay_ms(500);
-				cmd_action_group_speed(0x1E,300);
-				cmd_action_group_run(0x1E,1);
-				delay_ms(600);
-				tell_claw_to_catch();
-				delay_ms(200);
-				cmd_action_group_speed(0x21,300);
-				cmd_action_group_run(0x21,1);
-				delay_ms(800);
-				tell_openmv_to_loosen2();
-				delay_ms(200);
-				cmd_action_group_speed(0x25,175);
-				cmd_action_group_run(0x25,1);
-				delay_ms(800);
-				break;
+			span(5);
+			delay_ms(500);
+			cmd_action_group_speed(0x1E,300);
+			cmd_action_group_run(0x1E,1);
+			delay_ms(600);
+			tell_claw_to_catch();
+			delay_ms(200);
+			cmd_action_group_speed(0x21,300);
+			cmd_action_group_run(0x21,1);
+			delay_ms(800);
+			tell_openmv_to_loosen2();
+			delay_ms(200);
+			cmd_action_group_speed(0x25,175);
+			cmd_action_group_run(0x25,1);
+			delay_ms(800);
+			break;
 		}
 		if(putBallOrder[5] == 0x11)
 		{
@@ -2299,7 +2519,7 @@ void get_scores_qrcode_red(void)
 			delay_ms(200);
 			cmd_action_group_speed(0x21,300);
 			cmd_action_group_run(0x21,1);
-				delay_ms(800);
+			delay_ms(800);
 			tell_openmv_to_loosen2();
 			delay_ms(200);
 			cmd_action_group_speed(0x25,175);
@@ -2307,23 +2527,23 @@ void get_scores_qrcode_red(void)
 			delay_ms(800);
 			break;
 			}
-			if(putBallOrder[8] == 0x12)
+		if(putBallOrder[8] == 0x12)
 		{
-				span(5);
-				delay_ms(500);
-				cmd_action_group_speed(0x1E,300);
-				cmd_action_group_run(0x1E,1);
-				delay_ms(600);
-				tell_claw_to_catch();
-				delay_ms(200);
-				cmd_action_group_speed(0x21,300);
-				cmd_action_group_run(0x21,1);
-				delay_ms(800);
-				tell_openmv_to_loosen2();
-				delay_ms(200);
-				cmd_action_group_speed(0x25,175);
-				cmd_action_group_run(0x25,1);
-				delay_ms(800);
+			span(5);
+			delay_ms(500);
+			cmd_action_group_speed(0x1E,300);
+			cmd_action_group_run(0x1E,1);
+			delay_ms(600);
+			tell_claw_to_catch();
+			delay_ms(200);
+			cmd_action_group_speed(0x21,300);
+			cmd_action_group_run(0x21,1);
+			delay_ms(800);
+			tell_openmv_to_loosen2();
+			delay_ms(200);
+			cmd_action_group_speed(0x25,175);
+			cmd_action_group_run(0x25,1);
+			delay_ms(800);
 				break;
 		}
 		if(putBallOrder[8] == 0x11)
@@ -2348,6 +2568,13 @@ void get_scores_qrcode_red(void)
 	}
 }
 
+/**********************************************************************
+ * @Name    get_scores_qrcode_blue
+ * @declaration : è“åŠåœºå°†å°çƒæ”¾å…¥ä»“åº“å…¨è¿‡ç¨‹ï¼ˆåŒ…å«äºŒç»´ç ï¼‰
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void get_scores_qrcode_blue(void)
 {
 	hit_bar_red();
@@ -2408,7 +2635,7 @@ void get_scores_qrcode_blue(void)
 			delay_ms(200);
 			cmd_action_group_speed(0x21,300);
 			cmd_action_group_run(0x21,1);
-				delay_ms(800);
+			delay_ms(800);
 			tell_openmv_to_loosen2();
 			delay_ms(200);
 			cmd_action_group_speed(0x25,175);
@@ -2418,22 +2645,22 @@ void get_scores_qrcode_blue(void)
 			}
 		if(putBallOrder[2] == 0x12)
 		{
-				span(5);
-				delay_ms(500);
-				cmd_action_group_speed(0x1E,300);
-				cmd_action_group_run(0x1E,1);
-				delay_ms(600);
-				tell_claw_to_catch();
-				delay_ms(200);
-				cmd_action_group_speed(0x21,300);
-				cmd_action_group_run(0x21,1);
-				delay_ms(800);
-				tell_openmv_to_loosen2();
-				delay_ms(200);
-				cmd_action_group_speed(0x25,175);
-				cmd_action_group_run(0x25,1);
-				delay_ms(1000);
-				break;
+			span(5);
+			delay_ms(500);
+			cmd_action_group_speed(0x1E,300);
+			cmd_action_group_run(0x1E,1);
+			delay_ms(600);
+			tell_claw_to_catch();
+			delay_ms(200);
+			cmd_action_group_speed(0x21,300);
+			cmd_action_group_run(0x21,1);
+			delay_ms(800);
+			tell_openmv_to_loosen2();
+			delay_ms(200);
+			cmd_action_group_speed(0x25,175);
+			cmd_action_group_run(0x25,1);
+			delay_ms(1000);
+			break;
 		}
 		if(putBallOrder[2] == 0x11)
 		{
@@ -2522,23 +2749,23 @@ void get_scores_qrcode_blue(void)
 			delay_ms(1000);
 			break;
 			}
-				if(putBallOrder[5] == 0x12)
+		if(putBallOrder[5] == 0x12)
 		{
-				span(5);
-				delay_ms(500);
-				cmd_action_group_speed(0x1E,300);
-				cmd_action_group_run(0x1E,1);
-				delay_ms(600);
-				tell_claw_to_catch();
-				delay_ms(200);
-				cmd_action_group_speed(0x21,300);
-				cmd_action_group_run(0x21,1);
-				delay_ms(800);
-				tell_openmv_to_loosen2();
-				delay_ms(200);
-				cmd_action_group_speed(0x25,175);
-				cmd_action_group_run(0x25,1);
-				delay_ms(1000);
+			span(5);
+			delay_ms(500);
+			cmd_action_group_speed(0x1E,300);
+			cmd_action_group_run(0x1E,1);
+			delay_ms(600);
+			tell_claw_to_catch();
+			delay_ms(200);
+			cmd_action_group_speed(0x21,300);
+			cmd_action_group_run(0x21,1);
+			delay_ms(800);
+			tell_openmv_to_loosen2();
+			delay_ms(200);
+			cmd_action_group_speed(0x25,175);
+			cmd_action_group_run(0x25,1);
+			delay_ms(1000);
 				break;
 		}
 		if(putBallOrder[5] == 0x11)
@@ -2629,24 +2856,24 @@ void get_scores_qrcode_blue(void)
 			delay_ms(800);
 			break;
 			}
-			if(putBallOrder[8] == 0x12)
+		if(putBallOrder[8] == 0x12)
 		{
-				span(5);
-				delay_ms(500);
-				cmd_action_group_speed(0x1E,300);
-				cmd_action_group_run(0x1E,1);
-				delay_ms(600);
-				tell_claw_to_catch();
-				delay_ms(200);
-				cmd_action_group_speed(0x21,300);
-				cmd_action_group_run(0x21,1);
-				delay_ms(800);
-				tell_openmv_to_loosen2();
-				delay_ms(200);
-				cmd_action_group_speed(0x25,175);
-				cmd_action_group_run(0x25,1);
-				delay_ms(800);
-				break;
+			span(5);
+			delay_ms(500);
+			cmd_action_group_speed(0x1E,300);
+			cmd_action_group_run(0x1E,1);
+			delay_ms(600);
+			tell_claw_to_catch();
+			delay_ms(200);
+			cmd_action_group_speed(0x21,300);
+			cmd_action_group_run(0x21,1);
+			delay_ms(800);
+			tell_openmv_to_loosen2();
+			delay_ms(200);
+			cmd_action_group_speed(0x25,175);
+			cmd_action_group_run(0x25,1);
+			delay_ms(800);
+			break;
 		}
 		if(putBallOrder[8] == 0x11)
 		{
@@ -2671,13 +2898,19 @@ void get_scores_qrcode_blue(void)
 }
 
 
-//±¾Â·Ïß°üº¬×¢ÊÍµôµÄ´úÂëÎªµÚÒ»Ì×Â·Ïß£¬Ã»ÓÃºìÍâ¿ª¹Ø²â¾à
+/**********************************************************************
+ * @Name    road_of_honour_red
+ * @declaration : å…¨å‘è½®è·¯çº¿ï¼ˆæœ¬è·¯çº¿åŒ…å«æ³¨é‡Šæ‰çš„ä»£ç ä¸ºç¬¬ä¸€å¥—è·¯çº¿ï¼Œæ²¡ç”¨çº¢å¤–å¼€å…³æµ‹è·ï¼‰
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void road_of_honour_red(void)
 {
-	run_to_stairs_red();//×ßµ½½×ÌİÆ½Ì¨Ç°Ãæ
-	set_imu_status(&attitude,false);//¹ØµôÍÓÂİÒÇ×¼±¸×²°å×Ó
-	hit_bar_red();//×²°å
-	move_to_bar_right_red();//ÒÆµ½°åÓÒ±ß
+	run_to_stairs_red();//èµ°åˆ°é˜¶æ¢¯å¹³å°å‰é¢
+	set_imu_status(&attitude,false);//å…³æ‰é™€èºä»ªå‡†å¤‡æ’æ¿å­
+	hit_bar_red();//æ’æ¿
+	move_to_bar_right_red();//ç§»åˆ°æ¿å³è¾¹
 	
 	Catch_Steppedplatform_red();
 	servogroup_Init();
@@ -2688,16 +2921,16 @@ void road_of_honour_red(void)
 	delay_ms(100);
 	set_chassis_speed(-80, 0 , 0);
 	HAL_Delay(500);
-	imu_calibration();//Ìù×Å×ßµÄÊ±ºò½ÃÕı×ËÌ¬
+	imu_calibration();//è´´ç€èµ°çš„æ—¶å€™çŸ«æ­£å§¿æ€
 	
-	leave_bar_red();//´Ó½×ÌİÆ½Ì¨³öÀ´
+	leave_bar_red();//ä»é˜¶æ¢¯å¹³å°å‡ºæ¥
 	set_imu_status(&attitude,true);
 	delay_ms(2500);
 	set_chassis_speed(-15,0,0);
 	delay_ms(300);
 	set_chassis_speed(0,0,0);
 	delay_ms(500);
-	run_to_cornucopia_red();//µ½Ô²ÅÌ»úÈ¥
+	run_to_cornucopia_red();//åˆ°åœ†ç›˜æœºå»
 	delay_ms(200);
 	hit_bar_red();
 	move_to_bar_right_red();
@@ -2714,14 +2947,14 @@ void road_of_honour_red(void)
 	set_chassis_speed(0,30,0);
 	delay_ms(1000);
 	set_chassis_speed(-15,0,0);
-	final_Catch_disc_red();//Ô²ÅÌ»ú×¥Íê
+	final_Catch_disc_red();//åœ†ç›˜æœºæŠ“å®Œ
 	
 	
 	servogroup_Init();
 	delay_ms(2000);
 	set_chassis_speed(-80, 0 , 0);
 	delay_ms(500);
-	imu_calibration();//Ìù×Å×ßµÄÊ±ºò½ÃÕı×ËÌ¬
+	imu_calibration();//è´´ç€èµ°çš„æ—¶å€™çŸ«æ­£å§¿æ€
 	set_imu_status(&attitude,true);
 	set_chassis_speed(0,0,0);
 	HAL_Delay(500);
@@ -2744,13 +2977,19 @@ void road_of_honour_red(void)
 //	run_to_champion_red();
 }
 
-//±¾Â·Ïß°üº¬×¢ÊÍµôµÄ´úÂëÎªµÚÒ»Ì×Â·Ïß£¬Ã»ÓÃºìÍâ¿ª¹Ø²â¾à
+/**********************************************************************
+ * @Name    road_of_honour_red2
+ * @declaration : å…¨å‘è½®çº¢åŠåœºå…¨éƒ¨è·¯çº¿2ï¼ˆæœ¬è·¯çº¿åŒ…å«æ³¨é‡Šæ‰çš„ä»£ç ä¸ºç¬¬ä¸€å¥—è·¯çº¿ï¼Œæ²¡ç”¨çº¢å¤–å¼€å…³æµ‹è·ï¼‰
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void road_of_honour_red2(void)
 {
-	run_to_stairs_red();//×ßµ½½×ÌİÆ½Ì¨Ç°Ãæ
-	set_imu_status(&attitude,false);//¹ØµôÍÓÂİÒÇ×¼±¸×²°å×Ó
-	hit_bar_red();//×²°å
-	move_to_bar_right_red();//ÒÆµ½°åÓÒ±ß
+	run_to_stairs_red();//èµ°åˆ°é˜¶æ¢¯å¹³å°å‰é¢
+	set_imu_status(&attitude,false);//å…³æ‰é™€èºä»ªå‡†å¤‡æ’æ¿å­
+	hit_bar_red();//æ’æ¿
+	move_to_bar_right_red();//ç§»åˆ°æ¿å³è¾¹
 	
 	Catch_Steppedplatform_red();
 	servogroup_Init();
@@ -2761,16 +3000,16 @@ void road_of_honour_red2(void)
 	delay_ms(100);
 	set_chassis_speed(-80, 0 , 0);
 	HAL_Delay(500);
-	imu_calibration();//Ìù×Å×ßµÄÊ±ºò½ÃÕı×ËÌ¬
+	imu_calibration();//è´´ç€èµ°çš„æ—¶å€™çŸ«æ­£å§¿æ€
 	
-	leave_bar_red();//´Ó½×ÌİÆ½Ì¨³öÀ´
+	leave_bar_red();//ä»é˜¶æ¢¯å¹³å°å‡ºæ¥
 	set_imu_status(&attitude,true);
 	delay_ms(2500);
 	set_chassis_speed(-15,0,0);
 	delay_ms(300);
 	set_chassis_speed(0,0,0);
 	delay_ms(500);
-	run_to_cornucopia_red();//µ½Ô²ÅÌ»úÈ¥
+	run_to_cornucopia_red();//åˆ°åœ†ç›˜æœºå»
 	delay_ms(200);
 	hit_bar_red();
 	move_to_bar_right_red();
@@ -2787,14 +3026,14 @@ void road_of_honour_red2(void)
 	set_chassis_speed(0,30,0);
 	delay_ms(1000);
 	set_chassis_speed(-15,0,0);
-	final_Catch_disc_red();//Ô²ÅÌ»ú×¥Íê
+	final_Catch_disc_red();//åœ†ç›˜æœºæŠ“å®Œ
 	
 	
 	servogroup_Init();
 	delay_ms(2000);
 	set_chassis_speed(-80, 0 , 0);
 	delay_ms(500);
-	imu_calibration();//Ìù×Å×ßµÄÊ±ºò½ÃÕı×ËÌ¬
+	imu_calibration();//è´´ç€èµ°çš„æ—¶å€™çŸ«æ­£å§¿æ€
 	set_imu_status(&attitude,true);
 	set_chassis_speed(0,0,0);
 	HAL_Delay(500);
@@ -2821,12 +3060,19 @@ void road_of_honour_red2(void)
 	run_to_champion_red();
 }
 
+/**********************************************************************
+ * @Name    road_of_honour_blue
+ * @declaration : å…¨å‘è½®è“åŠåœºè·¯å¾„
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void road_of_honour_blue(void)
 {
-	run_to_stairs_blue();//×ßµ½½×ÌİÆ½Ì¨Ææ°¸
-	set_imu_status(&attitude,false);//¹ØµôÍÓÂİÒÇ×¼±¸×²°å×Ó
-	hit_bar_blue();//×²°å
-	move_to_bar_left_blue();//ÒÆµ½°åÓÒ±ß
+	run_to_stairs_blue();//èµ°åˆ°é˜¶æ¢¯å¹³å°å¥‡æ¡ˆ
+	set_imu_status(&attitude,false);//å…³æ‰é™€èºä»ªå‡†å¤‡æ’æ¿å­
+	hit_bar_blue();//æ’æ¿
+	move_to_bar_left_blue();//ç§»åˆ°æ¿å³è¾¹
 	
 	set_chassis_speed(50, 30 , 0);
 	HAL_Delay(500);
@@ -2836,13 +3082,13 @@ void road_of_honour_blue(void)
    }
 	set_chassis_speed(80, 0 , 0);
 	HAL_Delay(500);
-	imu_calibration();//Ìù×Å×ßµÄÊ±ºò½ÃÕı×ËÌ¬
+	imu_calibration();//è´´ç€èµ°çš„æ—¶å€™çŸ«æ­£å§¿æ€
 	
 //	set_imu_status(&attitude,true);
-	leave_bar_blue();//´Ó½×ÌİÆ½Ì¨³öÀ´
+	leave_bar_blue();//ä»é˜¶æ¢¯å¹³å°å‡ºæ¥
 	set_imu_status(&attitude,true);
 	delay_ms(2500);
-	run_to_cornucopia_blue();//µ½Ô²ÅÌ»úÈ¥
+	run_to_cornucopia_blue();//åˆ°åœ†ç›˜æœºå»
 	delay_ms(200);
 	hit_bar_blue();
 	move_to_bar_left_blue();
@@ -2851,7 +3097,7 @@ void road_of_honour_blue(void)
 	
 	set_chassis_speed(80, 0 , 0);
 	delay_ms(500);
-	imu_calibration();//Ìù×Å×ßµÄÊ±ºò½ÃÕı×ËÌ¬
+	imu_calibration();//è´´ç€èµ°çš„æ—¶å€™çŸ«æ­£å§¿æ€
 	set_imu_status(&attitude,true);
 	set_chassis_speed(0,0,0);
 	HAL_Delay(500);
@@ -2864,7 +3110,7 @@ void road_of_honour_blue(void)
 	HAL_Delay(500);
 	while(1) 
 	{
-      if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 1&&HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4) == 0)break;
+      	if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 1&&HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4) == 0)break;
    } 
 	while(1)
 	{
@@ -2877,39 +3123,52 @@ void road_of_honour_blue(void)
 	run_to_champion_blue();
 }
 
-//±¾Â·ÏßÃ»ÓĞÀûÓÃÇ°ºóµ²°å£¬ÓÃÑ­¼£°å¶¨Î»
+/**********************************************************************
+ * @Name    road_of_honour_red_two
+ * @declaration : å…¨å‘è½®è·¯å¾„ç¬¬nç‰ˆï¼ˆæœ¬è·¯çº¿æ²¡æœ‰åˆ©ç”¨å‰åæŒ¡æ¿ï¼Œç”¨å¾ªè¿¹æ¿å®šä½ï¼‰
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void road_of_honour_red_two(void)
 {
 	road_of_honour_red();
 		
-		set_chassis_speed(-50,0,0);
-		HAL_Delay(1000);
-		imu_reset(); 
-		set_imu_status(&attitude,true);
-		HAL_Delay(500);
-		set_chassis_speed(50,0,0);
-		HAL_Delay(300);
-		set_chassis_speed(0,0,0);
-		HAL_Delay(500);
+	set_chassis_speed(-50,0,0);
+	HAL_Delay(1000);
+	imu_reset(); 
+	set_imu_status(&attitude,true);
+	HAL_Delay(500);
+	set_chassis_speed(50,0,0);
+	HAL_Delay(300);
+	set_chassis_speed(0,0,0);
+	HAL_Delay(500);
 		
-		run_to_scores_red();
-		hit_bar_red();
-		while(1) 
+	run_to_scores_red();
+	hit_bar_red();
+	while(1) 
 	{
        set_chassis_speed(-30, 30, 0);
        if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0) break;
-  }
-		move_to_bar_right_red();
-		back_home_by_speed();
-		run_to_champion_red();
+  	}
+	move_to_bar_right_red();
+	back_home_by_speed();
+	run_to_champion_red();
 }
 
+/**********************************************************************
+ * @Name    road_of_honour_red_three
+ * @declaration : å…¨å‘è½®çº¢åŠåœºå…¨åœºè·¯çº¿ç¬¬nç‰ˆ
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void road_of_honour_red_three(void)
 {
-	run_to_stairs_red();//×ßµ½½×ÌİÆ½Ì¨Ææ°¸
-	set_imu_status(&attitude,false);//¹ØµôÍÓÂİÒÇ×¼±¸×²°å×Ó
-	hit_bar_red();//×²°å
-	move_to_bar_right_red();//ÒÆµ½°åÓÒ±ß
+	run_to_stairs_red();//èµ°åˆ°é˜¶æ¢¯å¹³å°å¥‡æ¡ˆ
+	set_imu_status(&attitude,false);//å…³æ‰é™€èºä»ªå‡†å¤‡æ’æ¿å­
+	hit_bar_red();//æ’æ¿
+	move_to_bar_right_red();//ç§»åˆ°æ¿å³è¾¹
 	
 	set_chassis_speed(-50, 30 , 0);
 	HAL_Delay(500);
@@ -2919,7 +3178,7 @@ void road_of_honour_red_three(void)
    }
 	set_chassis_speed(-80, 0 , 0);
 	HAL_Delay(500);
-	imu_calibration();//Ìù×Å×ßµÄÊ±ºò½ÃÕı×ËÌ¬
+	imu_calibration();//è´´ç€èµ°çš„æ—¶å€™çŸ«æ­£å§¿æ€
 	
 	set_imu_status(&attitude,true);
 	
@@ -2927,29 +3186,36 @@ void road_of_honour_red_three(void)
 	move_to_cornucopia_center();
 	 
 	set_chassis_speed(-50,0,0);
-		HAL_Delay(1000);
-		imu_reset(); 
-		set_imu_status(&attitude,true);
-		HAL_Delay(500);
-		set_chassis_speed(50,0,0);
-		HAL_Delay(300);
-		set_chassis_speed(0,0,0);
-		HAL_Delay(500);
-		
-		run_to_scores_red();
-		hit_bar_red();
-		while(1) 
+	HAL_Delay(1000);
+	imu_reset(); 
+	set_imu_status(&attitude,true);
+	HAL_Delay(500);
+	set_chassis_speed(50,0,0);
+	HAL_Delay(300);
+	set_chassis_speed(0,0,0);
+	HAL_Delay(500);
+	
+	run_to_scores_red();
+	hit_bar_red();
+	while(1) 
 	{
        set_chassis_speed(-30, 30, 0);
        if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0) break;
-  }
-		move_to_bar_right_red();
-		back_home_by_speed();
-		run_to_champion_red();
+  	}
+	move_to_bar_right_red();
+	back_home_by_speed();
+	run_to_champion_red();
 	
 }
 
-void rode_red_test(void)//ÂóÂÖ²âÊÔºÃµÄÂ·¾¶£¬°üÀ¨±ÜÕÏ
+/**********************************************************************
+ * @Name    rode_red_test
+ * @declaration : éº¦è½®çº¢åŠåœºå…¨åœºè·¯å¾„
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
+void rode_red_test(void)
 {
 //	span_init();
 	run_to_stairs_red();
@@ -2973,12 +3239,19 @@ void rode_red_test(void)//ÂóÂÖ²âÊÔºÃµÄÂ·¾¶£¬°üÀ¨±ÜÕÏ
 //       set_chassis_speed(10, 30, 0);
 //       if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0) break;
 //  }
-		get_qrcode();
+	get_qrcode();
 //		get_scores_red();
-		get_scores_qrcode_red();
-		back_home_by_speed();
+	get_scores_qrcode_red();
+	back_home_by_speed();
 }
 
+/**********************************************************************
+ * @Name    rode_blue_test
+ * @declaration : éº¦è½®è“åŠåœºè·¯å¾„
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void rode_blue_test(void)
 {
 	run_to_stairs_blue();
@@ -2996,57 +3269,57 @@ void rode_blue_test(void)
 	delay_ms(650);
 	set_chassis_speed(0,0,0);
 	final_Catch_disc_blue();
-		cmd_action_group_run(0x00,1);
-		delay_ms(1500);
-		set_chassis_speed(50,0,0);
-		delay_ms(500);
-		imu_calibration();
-		delay_ms(500);
-		set_chassis_speed(-50,0,0);
-		delay_ms(850);
-		set_imu_status(&attitude,true);
-		set_chassis_speed(0,0,0);
-		delay_ms(500);
-		move_by_encoder(2,-5000);
-		while(1)
-		{
-			set_chassis_speed(0,-80,0);    
-			if((HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 0&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0))break;
-		}
-		set_chassis_speed(0,-80,0);
-		HAL_Delay(1000);
-		hit_bar_blue();
-		move_to_bar_left_blue();
-		distinguish_blue();
-		distinguish_blue();
-		distinguish_blue();
-		distinguish_blue();
-		distinguish_blue();
-		stack_transfer_blue();
-		hit_bar_blue();
-		move_to_bar_left_blue();
-		get_qrcode();
-		hit_bar_blue();
-		get_scores_qrcode_blue();
+	cmd_action_group_run(0x00,1);
+	delay_ms(1500);
+	set_chassis_speed(50,0,0);
+	delay_ms(500);
+	imu_calibration();
+	delay_ms(500);
+	set_chassis_speed(-50,0,0);
+	delay_ms(850);
+	set_imu_status(&attitude,true);
+	set_chassis_speed(0,0,0);
+	delay_ms(500);
+	move_by_encoder(2,-5000);
+	while(1)
+	{
+		set_chassis_speed(0,-80,0);    
+		if((HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 0&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 0))break;
+	}
+	set_chassis_speed(0,-80,0);
+	HAL_Delay(1000);
+	hit_bar_blue();
+	move_to_bar_left_blue();
+	distinguish_blue();
+	distinguish_blue();
+	distinguish_blue();
+	distinguish_blue();
+	distinguish_blue();
+	stack_transfer_blue();
+	hit_bar_blue();
+	move_to_bar_left_blue();
+	get_qrcode();
+	hit_bar_blue();
+	get_scores_qrcode_blue();
 		
-		set_chassis_speed(-50,0,0);
-		delay_ms(250);
-		set_chassis_speed(0,0,0);
-		set_imu_status(&attitude,true);
-		delay_ms(500);
-		while(1)
-		{
-			set_chassis_speed(0,-80,0);
-			if((HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 1))break;
-		}
+	set_chassis_speed(-50,0,0);
+	delay_ms(250);
+	set_chassis_speed(0,0,0);
+	set_imu_status(&attitude,true);
+	delay_ms(500);
+	while(1)
+	{
 		set_chassis_speed(0,-80,0);
-		HAL_Delay(1500);
-		set_chassis_speed(0,-120,0);
-		HAL_Delay(1650);
-		set_chassis_speed(0,0,0);
-		delay_ms(300);
-		set_chassis_speed(-80,0,0);
-		delay_ms(1800);
+		if((HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 1))break;
+	}
+	set_chassis_speed(0,-80,0);
+	HAL_Delay(1500);
+	set_chassis_speed(0,-120,0);
+	HAL_Delay(1650);
+	set_chassis_speed(0,0,0);
+	delay_ms(300);
+	set_chassis_speed(-80,0,0);
+	delay_ms(1800);
 //		while(1)
 //	 {
 //		set_chassis_speed(-50,0,0);
@@ -3071,11 +3344,18 @@ void rode_blue_test(void)
 //	set_chassis_speed(30,0,0);
 //	HAL_Delay(850);
 		
-		set_chassis_speed(0,0,0);
-		delay_ms(300);
+	set_chassis_speed(0,0,0);
+	delay_ms(300);
 //		set_imu_status(&attitude,false);
 }
 
+/**********************************************************************
+ * @Name    blue_or_red
+ * @declaration : åˆ¤æ–­çº¢è“åŠåœºï¼ˆåˆ©ç”¨çº¢å¤–ä¼ æ„Ÿå™¨ï¼‰
+ * @param   None
+ * @retval   : æ— 
+ * @author  hoson_stars
+ ***********************************************************************/
 void blue_or_red(void)
 {
 	while(1)

@@ -44,11 +44,12 @@ bool verticalbar[9]={0};
 
 
 /**********************************************************************
-  * 函数名：read_rowbar
-  * 描述: 读取横向循迹板激光检测返回电平状态 ###黑色返回0 白色返回1###
-  * 参数：无
-  * 返回值:无
-***********************************************************************/
+ * @Name    read_rowbar
+ * @declaration : 读取横向循迹板激光检测返回电平状态 ###黑色返回0 白色返回1###
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void read_rowbar()
 {
     row_bar.ttl_msg[1] = !read_PD8_in;                  
@@ -61,13 +62,13 @@ void read_rowbar()
     row_bar.ttl_msg[8] = !read_PD0_in;
 }
 
-
 /**********************************************************************
-  * 函数名：read_verticalbar
-  * 描述: 读取纵向循迹板激光检测返回电平状态 ###黑色返回0 白色返回1###
-  * 参数：无
-  * 返回值:无
-***********************************************************************/
+ * @Name    read_verticalbar
+ * @declaration : 读取纵向循迹板激光检测返回电平状态 ###黑色返回0 白色返回1###
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void read_verticalbar()
 {
     vertical_bar.ttl_msg[1] = !read_PE10_in;                  
@@ -80,13 +81,13 @@ void read_verticalbar()
     vertical_bar.ttl_msg[8] = !read_PE12_in;
 }
 
-
 /**********************************************************************
-  * 函数名：send_bar_message
-  * 描述: 向主控发送循迹信息
-  * 参数：无
-  * 返回值:无
-***********************************************************************/
+ * @Name    send_rowbar_message
+ * @declaration : 向主控发送循迹信息
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void send_rowbar_message()
 {
     uint8_t i=0,rowbar_cnt=0;
@@ -106,11 +107,12 @@ void send_rowbar_message()
 }
 
 /**********************************************************************
-  * 函数名：send_verticalbar_message
-  * 描述: 向主控发送循迹信息
-  * 参数：无
-  * 返回值:无
-***********************************************************************/
+ * @Name    send_verticalbar_message
+ * @declaration : 向主控发送循迹信息
+ * @param   None
+ * @retval   : 无
+ * @author  hoson_stars
+ ***********************************************************************/
 void send_verticalbar_message()
 {
     uint8_t i=0,verticalbar_cnt=0;
@@ -130,11 +132,12 @@ void send_verticalbar_message()
 }
 
 /**********************************************************************
-  * 函数名：count_verticalbar_message
-  * 描述: 计算竖循迹板有几根管在白线上 
-  * 参数：无
-  * 返回值:无
-***********************************************************************/
+ * @Name    count_verticalbar_message
+ * @declaration : 计算竖循迹板有几根管在白线上 
+ * @param   None
+ * @retval   : verticalbar_cnt 计算结果
+ * @author  hoson_stars
+ ***********************************************************************/
 int count_verticalbar_message()
 {
     int i=0,verticalbar_cnt=0;
@@ -152,11 +155,12 @@ int count_verticalbar_message()
 }
 
 /**********************************************************************
-  * 函数名：count_rowbar_message
-  * 描述: 计算横循迹板有几根管在白线上 
-  * 参数：无
-  * 返回值:无
-***********************************************************************/
+ * @Name   count_rowbar_message
+ * @declaration : 计算横循迹板有几根管在白线上 
+ * @param   None
+ * @retval   : verticalbar_cnt 计算结果
+ * @author  hoson_stars
+ ***********************************************************************/
 int count_rowbar_message()
 {
     int i=0,rowbar_cnt=0;
