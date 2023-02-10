@@ -222,19 +222,19 @@ void run_to_cornucopia_red(void)
 	{
 		set_chassis_speed(0,30,0);
 		read_rowbar();
-		if(count_rowbar_message()>4 )break;
+		if(count_rowbar_message()>4 )break;    //到达第一个十字
 	}
 	while(1)
 	{
 		set_chassis_speed(0,50,0);
 		read_rowbar();
-		if(count_rowbar_message()<3)break;
+		if(count_rowbar_message()<3)break;   //离开第一个十字
 	}
 	while(1)
 	{
 		set_chassis_speed(0,60,0);
 		read_rowbar();
-		if(count_rowbar_message()>4)break;
+		if(count_rowbar_message()>4)break;   // 到达第二个十字
 	}
 	set_chassis_speed(0,0,0);
 	delay_ms(2500);
@@ -258,7 +258,7 @@ void run_to_cornucopia_red(void)
 	delay_ms(1000);
 	set_chassis_speed(70,0,0);
 	delay_ms(2000);
-	set_imu_status(&attitude,false);
+	set_imu_status(&attitude,false);       //转圈前关陀螺仪
   set_chassis_speed(0, 0, 50); 
 	delay_ms(1750);
 	set_chassis_speed(0,0,0);
@@ -430,7 +430,7 @@ void move_to_cornucopia_center(void)
 		while(1)
 		{
 			set_chassis_speed(0,-30,0);
-			if(HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_15) == 0)break;
+			if(HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_15) == 0)break;  //防止本身就距离过远，先怼上去
 		}
 		while(1)
 		{
@@ -497,6 +497,9 @@ void leave_cornucopia_blue(void)
 void run_to_scores_red(void)
 {
 /***************************************************************************************************
+ //这套直到赛前逻辑都是走得通的，但是赛前一次试跑之后不行了，所以就简单化处理了
+ //逻辑是先利用红外打在圆盘机挡板上两个都是0，然后两个都打在空处，再然后两个都打在仓库的挡板上，再延时一段时间确保车完全到了
+ //蓝半场还能用，可以debug一下看是什么问题
 	while(1)
 		{
 			set_chassis_speed(0,50,0);
@@ -518,7 +521,7 @@ void run_to_scores_red(void)
 		set_chassis_speed(0,0,0);
 *****************************************************************************************************/
 	cmd_action_group_run(0x00,1);
-	tell_openmv_to_loosen2();
+	tell_openmv_to_loosen2();          //防止有球抓着不放
 	delay_ms(1500);
 	set_chassis_speed(50,0,0);
 	delay_ms(500);
@@ -643,6 +646,7 @@ void back_home_by_speed(void)
 	{
 		set_chassis_speed(0,80,0);
 		if((HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == 1&&HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7) == 1))break;
+		//完全离开仓库挡板
 	}
 	set_chassis_speed(0,80,0);
 	HAL_Delay(1500);
@@ -675,6 +679,7 @@ void back_home_by_speed(void)
 	}
 	set_chassis_speed(30,0,0);
 	HAL_Delay(950);
+	//这个缺点在于向前的时间纯靠delay把参数试出来。后面找家的操作是一个奇思妙想，有这样一个过程位置相对只有一个while准确
 
 	set_chassis_speed(0,0,0);
 	delay_ms(300);
@@ -962,6 +967,7 @@ void run_to_champion_blue(void)
  ***********************************************************************/
 void rode_of_avoid(void)
 {
+	//全向轮的老方案
 		leave_bar_red();
 		HAL_Delay(500);
 		while(1)
@@ -1114,6 +1120,7 @@ void Catch_Steppedplatform_red()
 					case HEIGHT_3:
 						delay_ms(450);break;
 				}
+				//将20版高度判断提前，由于openmv打印件的问题，openmv有一定角度的倾斜，故不同高度看到球到抓球的延时不同
 				
         set_chassis_speed(0,0,0);
 
@@ -1138,7 +1145,7 @@ void Catch_Steppedplatform_red()
 								cmd_action_group_speed(0x07,150);
                 cmd_action_group_run(0x07,1);delay_ms(2200);break;
         }
-				tell_openmv_to_loosen3();
+				tell_openmv_to_loosen3();    //让小球底部转下去
 				delay_ms(500);
 				int ballid=0;
 				waittime = 300;
@@ -1147,7 +1154,7 @@ void Catch_Steppedplatform_red()
 					if(ReadBlockData(ballID) == STATUS_OK)break;
 					if (waittime == 0) break;
 				}
-				if(waittime == 0) continue;
+				if(waittime == 0) continue;//此处对没有获取到小球id处理不妥，圆盘机处做了修改，可移植
 				printf("nb666\n");
 				ballid=(int)ballID[1]; 
 				printf("%d",ballid);
@@ -1224,8 +1231,8 @@ void Catch_Steppedplatform_red()
                 break;
 					}
 //					tell_openmv_to_loosen2();//松开爪子
-//					delay_ms(1000);	//出现了奇怪的bug，不松开
-					if(ballid == 35||ballid == 18||ballid == 50||ballid == 33)
+//					delay_ms(1000);	//出现了奇怪的bug，不松开，加到switch里面解决了
+					if(ballid == 35||ballid == 18||ballid == 50||ballid == 33)//为原本两层仓库准备的，现可与下面switch合并
 					{
 						switch(ballid)
 						{
@@ -1548,7 +1555,7 @@ baohu_stepped:
 		openmv.message = 0;
         servogroup_catch_Stripplatform();//机械臂抬升
 		delay_ms(800);
-		delay_ms(delay_wait_red);
+		delay_ms(delay_wait_red);  //为了降低上去看到第一个就是目标球然后抓不住的情况发生的概率，不知道原理，但好用
 		if(i<4)
 		{
 			delay_wait_red -= 300;
@@ -1577,7 +1584,7 @@ baohu_stepped:
 		delay_ms(100);
 
 		openmv.message = 0;
-        servogroup_ic_Stripplatform();//这里应该加一个执行从圆盘机到读取ic数据
+        servogroup_ic_Stripplatform();
 		delay_ms(1000);
 		tell_openmv_to_loosen3();
 		delay_ms(500);
@@ -1595,12 +1602,12 @@ baohu_stepped:
 				tell_openmv_to_loosen3();
 				delay_ms(100);
 				waittime = 100;
-				ball_cnt++;
+				ball_cnt++;//多尝试几次
 			}
 			if(ball_cnt >= 2)break;
 		}
 		ball_cnt = 0;
-		if(waittime == 0) continue;
+		if(waittime == 0) continue;//为避免三次都识别不到但仍然抓住球，应该加个到某个地方松爪子的操作，不能直接放开，影响下一个球的读取
 		ballid=(int)ballID[1]; 
 		printf("%d",ballid);
 		tell_claw_to_catch();
@@ -1937,7 +1944,7 @@ void get_scores_red(void)
 	set_chassis_speed(0,0,0);
 	delay_ms(300);
 	cmd_action_group_run(0x1D,1);
-	span_find_zero();
+	span_find_zero();   //在运动过程中车上的仓库可能发生位移导致动作组不准，所以重新找一下0
 	delay_ms(1500);
 	set_chassis_speed(15, -30, 0);
 	while(1)

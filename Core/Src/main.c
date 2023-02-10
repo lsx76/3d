@@ -152,6 +152,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
+  //初始化函数和使能函数等顺序要注意
 	HAL_UART_Receive_IT(&huart1,&Buffer,1);
 	usmart_dev.init(108); 		    //初始化USMART testtest
 	
@@ -179,7 +180,6 @@ int main(void)
 	
 	
 	HAL_TIM_Base_Start_IT(&htim6);//调轮子pid时注释掉
-//	
 	imu_calibration();
 	delay_ms(1000);
 	set_imu_status(&attitude,true);
